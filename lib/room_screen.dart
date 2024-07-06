@@ -4,9 +4,10 @@ import 'dart:convert';
 
 class RoomScreen extends StatefulWidget {
   final int roomId;
+  final String roomName; // 방 이름 추가
   final String userName;
 
-  RoomScreen({required this.roomId, required this.userName});
+  RoomScreen({required this.roomId, required this.roomName, required this.userName});
 
   @override
   _RoomScreenState createState() => _RoomScreenState();
@@ -20,6 +21,12 @@ class _RoomScreenState extends State<RoomScreen> {
   void initState() {
     super.initState();
     _fetchParticipants();
+  }
+
+  @override
+  void dispose() {
+    _leaveRoom();
+    super.dispose();
   }
 
   Future<void> _fetchParticipants() async {
@@ -59,15 +66,39 @@ class _RoomScreenState extends State<RoomScreen> {
     }
   }
 
+  Future<void> _leaveRoom() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/leave'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userName': widget.userName}),
+      );
+
+      print('Leave room response status: ${response.statusCode}');
+      print('Leave room response body: ${response.body}');
+
+      if (response.statusCode != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('방에서 나가는 데 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
+    } catch (e) {
+      print('Leave room error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('방에서 나가는 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Room: ${widget.userName}'), // 방에 참가한 사용자의 이름을 표시
+        title: Text('Room: ${widget.roomName}'), // 방 이름 표시
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: _fetchParticipants, // 새로고침 버튼 클릭 시 참가자 목록 갱신
+            onPressed: _fetchParticipants,
           ),
         ],
       ),

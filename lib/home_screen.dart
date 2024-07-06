@@ -157,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _joinRoom(int roomId) async {
+  Future<void> _joinRoom(int roomId, String roomName) async {
     String? userId = await _loadUserId();
     String? userName = await _loadUserName();
 
@@ -191,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
           MaterialPageRoute(
             builder: (context) => RoomScreen(
               roomId: roomId,
+              roomName: roomName, // 방 이름 전달
               userName: userName,
             ),
           ),
@@ -290,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: ListTile(
                     title: Text(room['roomName']),
-                    onTap: () => _joinRoom(room['id']),
+                    onTap: () => _joinRoom(room['id'], room['roomName']), // 방 이름 추가 전달
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () => _deleteRoom(room['id']),
