@@ -91,32 +91,54 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Create room response body: ${response.body}');
 
       if (response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방이 성공적으로 생성되었습니다.')),
-        );
+        final roomId = jsonDecode(response.body)['roomId'];
+        final userId = await _loadUserId();
+        final userName = await _loadUserName();
+
+        if (userId != null && userName != null) {
+          final joinResponse = await http.post(
+            Uri.parse('http://172.10.7.88:80/api/rooms/$roomId/join'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'userId': userId, 'userName': userName, 'password': password}),
+          );
+
+          if (joinResponse.statusCode == 201) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RoomScreen(
+                  roomId: roomId,
+                  roomName: roomName, // 방 이름 전달
+                  userName: userName,
+                ),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('방에 참가하는 데 실패했습니다. 다시 시도해주세요.')),
+            );
+          }
+        }
+
         _roomNameController.clear();
         _passwordController.clear();
         _fetchRooms();
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('방 생성에 실패했습니다. 다시 시도해주세요.')),
-          );
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    } catch (e) {
-      print('Create room error: $e');
-      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방 생성 중 오류가 발생했습니다.')),
+          SnackBar(content: Text('방 생성에 실패했습니다. 다시 시도해주세요.')),
         );
         setState(() {
           _isLoading = false;
         });
       }
+    } catch (e) {
+      print('Create room error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('방 생성 중 오류가 발생했습니다.')),
+      );
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -139,25 +161,21 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         _fetchRooms();
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('방 삭제에 실패했습니다. 다시 시도해주세요.')),
-          );
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      }
-    } catch (e) {
-      print('Delete room error: $e');
-      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방 삭제 중 오류가 발생했습니다.')),
+          SnackBar(content: Text('방 삭제에 실패했습니다. 다시 시도해주세요.')),
         );
         setState(() {
           _isLoading = false;
         });
       }
+    } catch (e) {
+      print('Delete room error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('방 삭제 중 오류가 발생했습니다.')),
+      );
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -360,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: ListTile(
                     title: Text(room['roomName']),
-                    onTap: () => _joinRoom(room['id'], room['roomName'], room['password'] != null), // 비밀번호 여부 전달
+                    onTap: () => _joinRoom(room['id'], room['roomName'], room['password'] != ''), // 비밀번호 여부 전달
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () => _deleteRoom(room['id']),
