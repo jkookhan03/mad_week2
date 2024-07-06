@@ -4,21 +4,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
-import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  await _initialize();
   runApp(const MyApp());
-}
-
-Future<void> _initialize() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await NaverMapSdk.instance.initialize(
-    clientId: 'i7947mszxz',
-    onAuthFailed: (e) => log("네이버맵 인증오류 : $e", name: "onAuthFailed"),
-  );
 }
 
 class MyApp extends StatelessWidget {
@@ -46,7 +36,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    MapScreen(),
     LoginScreen(),
   ];
 
@@ -67,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _userId = userId;
         _userName = userName;
         _token = token;
-        _selectedIndex = 1; // Auto-navigate to map screen
+        _selectedIndex = 0; // Auto-navigate to home screen
       });
     }
   }
@@ -82,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter App with Naver Map'),
+        title: const Text('Flutter App with Naver Login'),
       ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
@@ -92,10 +81,6 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Map',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.login),
@@ -117,27 +102,6 @@ class HomeScreen extends StatelessWidget {
       child: Text(
         'Home Screen',
         style: TextStyle(fontSize: 24),
-      ),
-    );
-  }
-}
-
-class MapScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final Completer<NaverMapController> mapControllerCompleter = Completer();
-
-    return Scaffold(
-      body: NaverMap(
-        options: const NaverMapViewOptions(
-          indoorEnable: true,
-          locationButtonEnable: false,
-          consumeSymbolTapEvents: false,
-        ),
-        onMapReady: (controller) async {
-          mapControllerCompleter.complete(controller);
-          log("onMapReady", name: "onMapReady");
-        },
       ),
     );
   }
