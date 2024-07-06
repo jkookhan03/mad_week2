@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'room_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -25,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://172.10.7.88:80/api/rooms'),  // 포트를 80으로 수정
+        Uri.parse('http://172.10.7.88:80/api/rooms'),
       );
 
       print('Fetch rooms response status: ${response.statusCode}');
@@ -77,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://172.10.7.88:80/api/rooms'),  // 포트를 80으로 수정
+        Uri.parse('http://172.10.7.88:80/api/rooms'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'roomName': roomName}),
       );
@@ -90,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SnackBar(content: Text('방이 성공적으로 생성되었습니다.')),
         );
         _roomNameController.clear();
-        _fetchRooms(); // 방 생성 후 방 목록 갱신
+        _fetchRooms();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -121,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final response = await http.delete(
-        Uri.parse('http://172.10.7.88:80/api/rooms/$roomId'),  // 포트를 80으로 수정
+        Uri.parse('http://172.10.7.88:80/api/rooms/$roomId'),
       );
 
       print('Delete room response status: ${response.statusCode}');
@@ -131,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('방이 성공적으로 삭제되었습니다.')),
         );
-        _fetchRooms(); // 방 삭제 후 방 목록 갱신
+        _fetchRooms();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -155,6 +157,87 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _joinRoom(int roomId) async {
+    String? userId = await _loadUserId();
+    String? userName = await _loadUserName();
+
+    if (userId == null || userName == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('사용자 ID와 이름이 설정되지 않았습니다.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.10.7.88:80/api/rooms/$roomId/join'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userId': userId, 'userName': userName}),
+      );
+
+      print('Join room response status: ${response.statusCode}');
+      print('Join room response body: ${response.body}');
+
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('방에 성공적으로 참가하였습니다.')),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RoomScreen(
+              roomId: roomId,
+              userName: userName,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('방 참가에 실패했습니다. 다시 시도해주세요.')),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Join room error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('방 참가 중 오류가 발생했습니다.')),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // 사용자 ID 저장 함수
+  Future<void> _saveUserId(String userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', userId);
+  }
+
+  // 사용자 이름 저장 함수
+  Future<void> _saveUserName(String userName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userName', userName);
+  }
+
+  // 사용자 ID 로드 함수
+  Future<String?> _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId');
+  }
+
+  // 사용자 이름 로드 함수
+  Future<String?> _loadUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userName');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: _fetchRooms, // 새로고침 버튼 클릭 시 방 목록 갱신
+            onPressed: _fetchRooms,
           ),
         ],
       ),
@@ -207,6 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: ListTile(
                     title: Text(room['roomName']),
+                    onTap: () => _joinRoom(room['id']),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () => _deleteRoom(room['id']),
