@@ -55,6 +55,7 @@ class LoginState with ChangeNotifier {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('userId', accountResult.id);
           prefs.setString('userName', accountResult.name);
+          prefs.setString('token', token.accessToken); // 토큰 저장
 
           _accessToken = token.accessToken;
           _userId = accountResult.id;

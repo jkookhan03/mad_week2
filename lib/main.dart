@@ -21,24 +21,22 @@ class MyApp extends StatelessWidget {
 class InitialScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer<LoginState>(
-      builder: (context, loginState, child) {
-        return FutureBuilder(
-          future: loginState.checkAutoLogin(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            } else {
-              if (loginState.userId == 'None') {
-                return LoginScreen();
-              } else {
-                return MyHomePage();
-              }
-            }
-          },
-        );
+    final loginState = Provider.of<LoginState>(context, listen: false);
+
+    return FutureBuilder(
+      future: loginState.checkAutoLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        } else {
+          if (loginState.userId == 'None') {
+            return LoginScreen();
+          } else {
+            return MyHomePage();
+          }
+        }
       },
     );
   }
@@ -143,9 +141,6 @@ class LoginScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('AccessToken: ${loginState.accessToken}'),
-            Text('UserID: ${loginState.userId}'),
-            Text('UserName: ${loginState.userName}'),
             ElevatedButton(
               onPressed: () async {
                 bool success = await loginState.login();
