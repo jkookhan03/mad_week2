@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:web_socket_channel/io.dart';
+import 'game_screen.dart';  // game_screen import 추가
 
 class RoomScreen extends StatefulWidget {
   final int roomId;
@@ -20,19 +22,49 @@ class _RoomScreenState extends State<RoomScreen> {
   List<Map<String, dynamic>> _participants = [];
   String? _leaderId;
   Timer? _timer;
+  late IOWebSocketChannel _channel;
 
   @override
   void initState() {
     super.initState();
     _fetchParticipants();
     _startAutoRefresh();
+    _connectWebSocket();
   }
 
   @override
   void dispose() {
     _leaveRoom();
     _timer?.cancel();
+    _channel.sink.close();
     super.dispose();
+  }
+
+  void _connectWebSocket() {
+    _channel = IOWebSocketChannel.connect('ws://172.10.7.88:80');
+    _channel.sink.add(jsonEncode({
+      'type': 'join',
+      'roomId': widget.roomId,
+    }));
+
+    _channel.stream.listen((message) {
+      final parsedMessage = jsonDecode(message);
+      if (parsedMessage['type'] == 'game-started' && parsedMessage['roomId'] == widget.roomId) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GameScreen(),
+          ),
+        );
+      }
+    });
+  }
+
+  void _startGame() {
+    _channel.sink.add(jsonEncode({
+      'type': 'start-game',
+      'roomId': widget.roomId,
+    }));
   }
 
   void _startAutoRefresh() {
@@ -242,7 +274,7 @@ class _RoomScreenState extends State<RoomScreen> {
             ),
             ElevatedButton(
               onPressed: isLeader
-                  ? (allReadyExceptLeader ? () => print('게임 시작') : null)
+                  ? (allReadyExceptLeader ? _startGame : null)
                   : _updateReadyState,
               child: Text(isLeader ? '게임 시작' : (_participants.firstWhere((p) => p['userId'] == widget.userId, orElse: () => {'isReady': false})['isReady'] ? '준비 해제' : '준비')), // userName 대신 userId 사용
             ),
