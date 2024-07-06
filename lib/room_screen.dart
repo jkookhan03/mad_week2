@@ -7,8 +7,9 @@ class RoomScreen extends StatefulWidget {
   final int roomId;
   final String roomName;
   final String userName;
+  final String userId; // userId 추가
 
-  RoomScreen({required this.roomId, required this.roomName, required this.userName});
+  RoomScreen({required this.roomId, required this.roomName, required this.userName, required this.userId}); // userId 추가
 
   @override
   _RoomScreenState createState() => _RoomScreenState();
@@ -29,6 +30,7 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   void dispose() {
+    _leaveRoom();
     _timer?.cancel();
     super.dispose();
   }
@@ -78,6 +80,24 @@ class _RoomScreenState extends State<RoomScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _leaveRoom() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/leave'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'userId': widget.userId}), // 올바른 userId 전달
+      );
+
+      if (response.statusCode == 200) {
+        print('Left the room successfully');
+      } else {
+        print('Failed to leave the room: ${response.body}');
+      }
+    } catch (e) {
+      print('Error leaving the room: $e');
     }
   }
 
@@ -132,7 +152,7 @@ class _RoomScreenState extends State<RoomScreen> {
       final response = await http.post(
         Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/transfer-leadership'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'currentLeaderId': widget.userName, 'newLeaderId': newLeaderId}),
+        body: jsonEncode({'currentLeaderId': widget.userId, 'newLeaderId': newLeaderId}), // currentLeaderId 수정
       );
 
       if (response.statusCode == 200) {
@@ -162,66 +182,72 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLeader = _leaderId == widget.userName;
+    final isLeader = _leaderId == widget.userId; // userName 대신 userId 사용
     final allReadyExceptLeader = _allParticipantsReadyExceptLeader();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Room: ${widget.roomName}'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: _fetchParticipants,
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          SizedBox(height: 32),
-          Text(
-            '참가자 목록',
-            style: TextStyle(fontSize: 24),
-          ),
-          Expanded(
-            child: _participants.isEmpty
-                ? Center(
-              child: Text(
-                '참가자가 없습니다.',
-                style: TextStyle(fontSize: 20),
-              ),
-            )
-                : ListView.builder(
-              itemCount: _participants.length,
-              itemBuilder: (context, index) {
-                final participant = _participants[index];
-                final isLeader = participant['isLeader'];
-                final userName = participant['userName'];
-                final readyStatus = participant['isReady'] ? '준비됨' : '준비 안됨';
-                final displayName = isLeader ? '$userName (방장)' : userName;
-
-                return ListTile(
-                  title: Text(
-                    '$displayName ($readyStatus)',
-                  ),
-                  trailing: isLeader && participant['userId'] != widget.userName
-                      ? IconButton(
-                    icon: Icon(Icons.person_add),
-                    onPressed: () => _transferLeadership(participant['userId']),
-                  )
-                      : null,
-                );
-              },
+    return WillPopScope(
+      onWillPop: () async {
+        await _leaveRoom();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Room: ${widget.roomName}'),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: _fetchParticipants,
             ),
-          ),
-          ElevatedButton(
-            onPressed: isLeader
-                ? (allReadyExceptLeader ? () => print('게임 시작') : null)
-                : _updateReadyState,
-            child: Text(isLeader ? '게임 시작' : (_participants.firstWhere((p) => p['userName'] == widget.userName, orElse: () => {'isReady': false})['isReady'] ? '준비 해제' : '준비')),
-          ),
-        ],
+          ],
+        ),
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+          children: [
+            SizedBox(height: 32),
+            Text(
+              '참가자 목록',
+              style: TextStyle(fontSize: 24),
+            ),
+            Expanded(
+              child: _participants.isEmpty
+                  ? Center(
+                child: Text(
+                  '참가자가 없습니다.',
+                  style: TextStyle(fontSize: 20),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: _participants.length,
+                itemBuilder: (context, index) {
+                  final participant = _participants[index];
+                  final isLeader = participant['isLeader'];
+                  final userName = participant['userName'];
+                  final readyStatus = participant['isReady'] ? '준비됨' : '준비 안됨';
+                  final displayName = isLeader ? '$userName (방장)' : userName;
+
+                  return ListTile(
+                    title: Text(
+                      '$displayName ($readyStatus)',
+                    ),
+                    trailing: isLeader && participant['userId'] != widget.userId // userName 대신 userId 사용
+                        ? IconButton(
+                      icon: Icon(Icons.person_add),
+                      onPressed: () => _transferLeadership(participant['userId']), // userName 대신 userId 사용
+                    )
+                        : null,
+                  );
+                },
+              ),
+            ),
+            ElevatedButton(
+              onPressed: isLeader
+                  ? (allReadyExceptLeader ? () => print('게임 시작') : null)
+                  : _updateReadyState,
+              child: Text(isLeader ? '게임 시작' : (_participants.firstWhere((p) => p['userId'] == widget.userId, orElse: () => {'isReady': false})['isReady'] ? '준비 해제' : '준비')), // userName 대신 userId 사용
+            ),
+          ],
+        ),
       ),
     );
   }

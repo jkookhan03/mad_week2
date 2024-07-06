@@ -115,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
               roomId: roomId,
               roomName: roomName, // 방 이름 전달
               userName: userName,
+              userId: userId, // userId 추가
             ),
           ),
         );
@@ -220,6 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
               roomId: roomId,
               roomName: roomName, // 방 이름 전달
               userName: userName,
+              userId: userId, // userId 추가
             ),
           ),
         );
