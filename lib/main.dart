@@ -1,23 +1,45 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_naver_login/flutter_naver_login.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'login_service.dart';
 
-void main() async {
-  runApp(const MyApp());
+void main() {
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MyHomePage(),
+    return ChangeNotifierProvider(
+      create: (context) => LoginState(),
+      child: MaterialApp(
+        home: InitialScreen(),
+      ),
+    );
+  }
+}
+
+class InitialScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<LoginState>(
+      builder: (context, loginState, child) {
+        return FutureBuilder(
+          future: loginState.checkAutoLogin(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            } else {
+              if (loginState.userId == 'None') {
+                return LoginScreen();
+              } else {
+                return MyHomePage();
+              }
+            }
+          },
+        );
+      },
     );
   }
 }
@@ -29,37 +51,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  String _accessToken = 'None';
-  String _userId = 'None';
-  String _userName = 'None';
-  String _token = '';
 
   static List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    LoginScreen(),
+    UserScreen(),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAutoLogin();
-  }
-
-  Future<void> _checkAutoLogin() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
-    String? userName = prefs.getString('userName');
-    String? token = prefs.getString('token');
-
-    if (userId != null && userName != null && token != null) {
-      setState(() {
-        _userId = userId;
-        _userName = userName;
-        _token = token;
-        _selectedIndex = 0; // Auto-navigate to home screen
-      });
-    }
-  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -83,8 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.login),
-            label: 'Login',
+            icon: Icon(Icons.person),
+            label: 'User',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -100,109 +96,70 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        'Home Screen',
+        'Home',
         style: TextStyle(fontSize: 24),
       ),
     );
   }
 }
 
-class LoginScreen extends StatefulWidget {
-  @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  String _accessToken = 'None';
-  String _userId = 'None';
-  String _userName = 'None';
-
+class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final loginState = Provider.of<LoginState>(context);
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'User ID: ${loginState.userId}',
+            style: TextStyle(fontSize: 20),
+          ),
+          Text(
+            'User Name: ${loginState.userName}',
+            style: TextStyle(fontSize: 20),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              loginState.logout();
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => InitialScreen()),
+              );
+            },
+            child: Text('Logout'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LoginScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final loginState = Provider.of<LoginState>(context);
     return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('AccessToken: $_accessToken'),
-            Text('UserID: $_userId'),
-            Text('UserName: $_userName'),
+            Text('AccessToken: ${loginState.accessToken}'),
+            Text('UserID: ${loginState.userId}'),
+            Text('UserName: ${loginState.userName}'),
             ElevatedButton(
-              onPressed: _login,
+              onPressed: () async {
+                bool success = await loginState.login();
+                if (success) {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => MyHomePage()),
+                  );
+                }
+              },
               child: Text('Login with Naver'),
-            ),
-            ElevatedButton(
-              onPressed: _logout,
-              child: Text('Logout'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _login() async {
-    NaverLoginResult result = await FlutterNaverLogin.logIn();
-    if (result.status == NaverLoginStatus.loggedIn) {
-      NaverAccessToken token = await FlutterNaverLogin.currentAccessToken;
-      NaverAccountResult accountResult = await FlutterNaverLogin.currentAccount();
-
-      log('Login successful: ${accountResult.id}, ${accountResult.name}');
-      log('Access token: ${token.accessToken}');
-
-      setState(() {
-        _accessToken = token.accessToken;
-        _userId = accountResult.id;
-        _userName = accountResult.name;
-      });
-
-      log('Sending HTTP request to server...');
-
-      try {
-        final response = await http.post(
-          Uri.parse('http://172.10.7.88:80/login'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'userId': accountResult.id,
-            'userName': accountResult.name,
-          }),
-        );
-
-        log('Server response: ${response.statusCode}, ${response.body}');
-
-        if (response.statusCode == 200) {
-          final responseData = json.decode(response.body);
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString('userId', accountResult.id);
-          prefs.setString('userName', accountResult.name);
-          // 서버 응답에서 token 필드가 없으므로 해당 부분을 제거합니다.
-          //prefs.setString('token', responseData['token']);
-        } else {
-          log('Failed to login to server: ${response.body}');
-        }
-      } catch (e) {
-        log('HTTP request error: $e');
-      }
-    } else {
-      setState(() {
-        _accessToken = 'None';
-        _userId = 'None';
-        _userName = 'None';
-      });
-    }
-  }
-
-  Future<void> _logout() async {
-    await FlutterNaverLogin.logOut();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('userId');
-    prefs.remove('userName');
-    prefs.remove('token');
-
-    setState(() {
-      _accessToken = 'None';
-      _userId = 'None';
-      _userName = 'None';
-    });
   }
 }
