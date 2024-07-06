@@ -40,6 +40,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_naver_map: ^1.0.2
+  flutter_naver_login: ^1.8.0
+  shared_preferences: ^2.0.6
+  http: ^0.13.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

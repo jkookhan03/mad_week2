@@ -15,4 +15,8 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
+    <string name="app_name">mad_week2</string>
+    <string name="client_id">I1oE0VgZYsNG9uisQMyd</string>
+    <string name="client_secret">z9sdaM2kwP</string>
+    <string name="client_name">runmusic</string>
 </resources>
