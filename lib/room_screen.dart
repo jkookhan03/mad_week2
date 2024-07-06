@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 class RoomScreen extends StatefulWidget {
   final int roomId;
-  final String roomName; // 방 이름 추가
+  final String roomName;
   final String userName;
 
   RoomScreen({required this.roomId, required this.roomName, required this.userName});
@@ -15,25 +16,30 @@ class RoomScreen extends StatefulWidget {
 
 class _RoomScreenState extends State<RoomScreen> {
   bool _isLoading = false;
-  List<String> _participants = [];
+  List<Map<String, dynamic>> _participants = [];
+  String? _leaderId;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _fetchParticipants();
+    _startAutoRefresh();
   }
 
   @override
   void dispose() {
-    _leaveRoom();
+    _timer?.cancel();
     super.dispose();
   }
 
-  Future<void> _fetchParticipants() async {
-    setState(() {
-      _isLoading = true;
+  void _startAutoRefresh() {
+    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+      _fetchParticipants();
     });
+  }
 
+  Future<void> _fetchParticipants() async {
     try {
       final response = await http.get(
         Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/participants'),
@@ -43,8 +49,17 @@ class _RoomScreenState extends State<RoomScreen> {
       print('Fetch participants response body: ${response.body}');
 
       if (response.statusCode == 200) {
+        List<Map<String, dynamic>> participants = List<Map<String, dynamic>>.from(json.decode(response.body));
+        participants = participants.map((p) => {
+          'userId': p['userId'],
+          'userName': p['userName'],
+          'isLeader': p['isLeader'] == 1,
+          'isReady': p['isReady'] == 1,
+        }).toList();
+
         setState(() {
-          _participants = List<String>.from(json.decode(response.body).map((item) => item['userName']));
+          _participants = participants;
+          _leaderId = _participants.firstWhere((p) => p['isLeader'], orElse: () => {'userId': null})['userId'];
           _isLoading = false;
         });
       } else {
@@ -66,35 +81,93 @@ class _RoomScreenState extends State<RoomScreen> {
     }
   }
 
-  Future<void> _leaveRoom() async {
+  Future<void> _updateReadyState() async {
+    final currentUser = _participants.firstWhere((p) => p['userName'] == widget.userName, orElse: () => {});
+    if (currentUser.isEmpty) return;
+
+    final newReadyState = !currentUser['isReady'];
+
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final response = await http.post(
-        Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/leave'),
+        Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/ready'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'userName': widget.userName}),
+        body: jsonEncode({'userId': currentUser['userId'], 'isReady': newReadyState}),
       );
 
-      print('Leave room response status: ${response.statusCode}');
-      print('Leave room response body: ${response.body}');
+      print('Update ready state response status: ${response.statusCode}');
+      print('Update ready state response body: ${response.body}');
 
-      if (response.statusCode != 200) {
+      if (response.statusCode == 200) {
+        setState(() {
+          currentUser['isReady'] = newReadyState;
+        });
+        _fetchParticipants(); // 서버에 업데이트 후 참가자 목록 갱신
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방에서 나가는 데 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('준비 상태를 업데이트하는 데 실패했습니다. 다시 시도해주세요.')),
         );
       }
     } catch (e) {
-      print('Leave room error: $e');
+      print('Update ready state error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('방에서 나가는 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('준비 상태를 업데이트하는 중 오류가 발생했습니다.')),
       );
     }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _transferLeadership(String newLeaderId) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/transfer-leadership'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'currentLeaderId': widget.userName, 'newLeaderId': newLeaderId}),
+      );
+
+      if (response.statusCode == 200) {
+        _fetchParticipants();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('방장 권한을 넘기는 데 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
+    } catch (e) {
+      print('Transfer leadership error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('방장 권한을 넘기는 중 오류가 발생했습니다.')),
+      );
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  bool _allParticipantsReadyExceptLeader() {
+    return _participants
+        .where((p) => p['userId'] != _leaderId)
+        .every((p) => p['isReady']);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLeader = _leaderId == widget.userName;
+    final allReadyExceptLeader = _allParticipantsReadyExceptLeader();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Room: ${widget.roomName}'), // 방 이름 표시
+        title: Text('Room: ${widget.roomName}'),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -123,11 +196,30 @@ class _RoomScreenState extends State<RoomScreen> {
               itemCount: _participants.length,
               itemBuilder: (context, index) {
                 final participant = _participants[index];
+                final isLeader = participant['isLeader'];
+                final userName = participant['userName'];
+                final readyStatus = participant['isReady'] ? '준비됨' : '준비 안됨';
+                final displayName = isLeader ? '$userName (방장)' : userName;
+
                 return ListTile(
-                  title: Text(participant),
+                  title: Text(
+                    '$displayName ($readyStatus)',
+                  ),
+                  trailing: isLeader && participant['userId'] != widget.userName
+                      ? IconButton(
+                    icon: Icon(Icons.person_add),
+                    onPressed: () => _transferLeadership(participant['userId']),
+                  )
+                      : null,
                 );
               },
             ),
+          ),
+          ElevatedButton(
+            onPressed: isLeader
+                ? (allReadyExceptLeader ? () => print('게임 시작') : null)
+                : _updateReadyState,
+            child: Text(isLeader ? '게임 시작' : (_participants.firstWhere((p) => p['userName'] == widget.userName, orElse: () => {'isReady': false})['isReady'] ? '준비 해제' : '준비')),
           ),
         ],
       ),

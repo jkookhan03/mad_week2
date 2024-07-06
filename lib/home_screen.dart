@@ -76,6 +76,16 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
+    final userId = await _loadUserId();
+    final userName = await _loadUserName();
+
+    if (userId == null || userName == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('사용자 ID와 이름이 설정되지 않았습니다.')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -84,7 +94,12 @@ class _HomeScreenState extends State<HomeScreen> {
       final response = await http.post(
         Uri.parse('http://172.10.7.88:80/api/rooms'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'roomName': roomName, 'password': password}),
+        body: jsonEncode({
+          'roomName': roomName,
+          'password': password,
+          'userId': userId,
+          'userName': userName,
+        }),
       );
 
       print('Create room response status: ${response.statusCode}');
@@ -92,33 +107,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (response.statusCode == 201) {
         final roomId = jsonDecode(response.body)['roomId'];
-        final userId = await _loadUserId();
-        final userName = await _loadUserName();
 
-        if (userId != null && userName != null) {
-          final joinResponse = await http.post(
-            Uri.parse('http://172.10.7.88:80/api/rooms/$roomId/join'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'userId': userId, 'userName': userName, 'password': password}),
-          );
-
-          if (joinResponse.statusCode == 201) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RoomScreen(
-                  roomId: roomId,
-                  roomName: roomName, // 방 이름 전달
-                  userName: userName,
-                ),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('방에 참가하는 데 실패했습니다. 다시 시도해주세요.')),
-            );
-          }
-        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RoomScreen(
+              roomId: roomId,
+              roomName: roomName, // 방 이름 전달
+              userName: userName,
+            ),
+          ),
+        );
 
         _roomNameController.clear();
         _passwordController.clear();
