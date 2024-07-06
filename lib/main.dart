@@ -211,7 +211,8 @@ class _LoginScreenState extends State<LoginScreen> {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('userId', accountResult.id);
           prefs.setString('userName', accountResult.name);
-          prefs.setString('token', responseData['token']);
+          // 서버 응답에서 token 필드가 없으므로 해당 부분을 제거합니다.
+          //prefs.setString('token', responseData['token']);
         } else {
           log('Failed to login to server: ${response.body}');
         }
