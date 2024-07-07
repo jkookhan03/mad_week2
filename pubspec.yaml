@@ -57,6 +57,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/KakaoTalk_20240706_235918320.png
+    - assets/KakaoTalk_20240706_235918320_01.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
