@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'home_screen.dart';
 import 'room_screen.dart';
+import 'main.dart'; // MyHomePage import 추가
 
 class RankingScreen extends StatelessWidget {
   final int roomId;
@@ -33,7 +34,7 @@ class RankingScreen extends StatelessWidget {
         print('Left the room successfully');
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => MyHomePage()), // MyHomePage로 변경
               (Route<dynamic> route) => false,
         );
       } else {
@@ -87,18 +88,18 @@ class RankingScreen extends StatelessWidget {
                 final scoreEntry = filteredScores[index];
                 return ListTile(
                   title: Text(
-                      '${index + 1}. ${scoreEntry['userName']}',
-                      style: TextStyle(
-                        fontFamily: 'Jua-Regular',
-                        fontSize: 20,
-                      ),
+                    '${index + 1}. ${scoreEntry['userName']}',
+                    style: TextStyle(
+                      fontFamily: 'Jua-Regular',
+                      fontSize: 20,
+                    ),
                   ),
                   trailing: Text(
-                      '${scoreEntry['score']} 점',
-                      style: TextStyle(
-                        fontFamily: 'Jua-Regular',
-                        fontSize: 20,
-                      ),
+                    '${scoreEntry['score']} 점',
+                    style: TextStyle(
+                      fontFamily: 'Jua-Regular',
+                      fontSize: 20,
+                    ),
                   ),
                 );
               },
