@@ -107,7 +107,7 @@ class _RoomScreenState extends State<RoomScreen> {
   }
 
   void _startAutoRefresh() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
       _fetchParticipants();
       _fetchGameSettings(); // 5초마다 게임 설정을 새로고침합니다.
     });
@@ -418,7 +418,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       Text('게임 시간: ', style: TextStyle(fontSize: 16)),
                       DropdownButton<int>(
                         value: _selectedDuration,
-                        items: [10, 20, 30, 40, 50, 60].map((int value) {
+                        items: [10, 20, 30].map((int value) {
                           return DropdownMenuItem<int>(
                             value: value,
                             child: Text('$value초'),
