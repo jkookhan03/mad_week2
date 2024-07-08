@@ -32,6 +32,7 @@ class _RoomScreenState extends State<RoomScreen> {
   void initState() {
     super.initState();
     _fetchParticipants();
+    _fetchGameSettings(); // 방장 설정 정보 가져오기
     _startAutoRefresh();
     _connectWebSocket();
   }
@@ -56,7 +57,9 @@ class _RoomScreenState extends State<RoomScreen> {
     _channel.stream.listen((message) {
       final parsedMessage = jsonDecode(message);
       if (parsedMessage['type'] == 'game-started' && parsedMessage['roomId'] == widget.roomId) {
-        _isGameStarted = true; // 게임 시작 플래그 설정
+        setState(() {
+          _isGameStarted = true; // 게임 시작 플래그 설정
+        });
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -81,10 +84,6 @@ class _RoomScreenState extends State<RoomScreen> {
             },
           ),
         );
-      } else if (parsedMessage['type'] == 'participant-joined' && parsedMessage['roomId'] == widget.roomId) {
-        _fetchParticipants();  // 참가자가 들어오면 참가자 목록 새로고침
-      } else if (parsedMessage['type'] == 'participant-left' && parsedMessage['roomId'] == widget.roomId) {
-        _fetchParticipants();  // 참가자가 나가면 참가자 목록 새로고침
       }
     });
   }
@@ -99,8 +98,9 @@ class _RoomScreenState extends State<RoomScreen> {
   }
 
   void _startAutoRefresh() {
-    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       _fetchParticipants();
+      _fetchGameSettings(); // 5초마다 게임 설정을 새로고침합니다.
     });
   }
 
@@ -143,6 +143,55 @@ class _RoomScreenState extends State<RoomScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _fetchGameSettings() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/settings'),
+      );
+
+      print('Fetch game settings response status: ${response.statusCode}');
+      print('Fetch game settings response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final settings = json.decode(response.body);
+        setState(() {
+          _selectedGame = settings['game'] ?? 'tab_game';
+          _selectedDuration = settings['duration'] ?? 20;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('게임 설정 정보를 불러오는데 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
+    } catch (e) {
+      print('Fetch game settings error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('게임 설정 정보를 불러오는 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  Future<void> _updateGameSettings() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/settings'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'game': _selectedGame, 'duration': _selectedDuration}),
+      );
+
+      if (response.statusCode != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('게임 설정을 업데이트하는 데 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
+    } catch (e) {
+      print('Update game settings error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('게임 설정을 업데이트하는 중 오류가 발생했습니다.')),
+      );
     }
   }
 
@@ -272,18 +321,14 @@ class _RoomScreenState extends State<RoomScreen> {
             SizedBox(height: 32),
             Text(
               '참가자 목록',
-              style: TextStyle(
-                  fontSize: 24,
-                  fontFamily: 'Jua-Regular'),
+              style: TextStyle(fontSize: 24),
             ),
             Expanded(
               child: _participants.isEmpty
                   ? Center(
                 child: Text(
                   '참가자가 없습니다.',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'Jua-Regular'),
+                  style: TextStyle(fontSize: 20),
                 ),
               )
                   : ListView.builder(
@@ -309,75 +354,70 @@ class _RoomScreenState extends State<RoomScreen> {
                 },
               ),
             ),
-            // 게임 선택 UI 추가
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedGame = 'tab_game';
-                    });
-                  },
-                  child: Text('Tab Game'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedGame == 'tab_game' ? Colors.blue : Colors.grey,
+            // 게임 선택 UI 추가 (방장만 보이도록 수정)
+            if (isLeader)
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedGame = 'tab_game';
+                          });
+                          _updateGameSettings(); // 방장이 게임 설정을 변경할 때 서버에 전송
+                        },
+                        child: Text('Tab Game'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _selectedGame == 'tab_game' ? Colors.blue : Colors.grey,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedGame = 'balloon_game';
+                          });
+                          _updateGameSettings(); // 방장이 게임 설정을 변경할 때 서버에 전송
+                        },
+                        child: Text('Balloon Game'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _selectedGame == 'balloon_game' ? Colors.blue : Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedGame = 'balloon_game';
-                    });
-                  },
-                  child: Text('Balloon Game'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedGame == 'balloon_game' ? Colors.blue : Colors.grey,
+                  SizedBox(height: 10),
+                  // 게임 시간 선택 UI 추가 (방장만 보이도록 수정)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('게임 시간: ', style: TextStyle(fontSize: 16)),
+                      DropdownButton<int>(
+                        value: _selectedDuration,
+                        items: [10, 20, 30, 40, 50, 60].map((int value) {
+                          return DropdownMenuItem<int>(
+                            value: value,
+                            child: Text('$value초'),
+                          );
+                        }).toList(),
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            _selectedDuration = newValue ?? 20;
+                          });
+                          _updateGameSettings(); // 방장이 게임 시간을 변경할 때 서버에 전송
+                        },
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            // 게임 시간 선택 UI 추가
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('게임 시간: ', style: TextStyle(fontSize: 16)),
-                DropdownButton<int>(
-                  value: _selectedDuration,
-                  items: [10, 20, 30, 40, 50, 60].map((int value) {
-                    return DropdownMenuItem<int>(
-                      value: value,
-                      child: Text('$value초'),
-                    );
-                  }).toList(),
-                  onChanged: (int? newValue) {
-                    setState(() {
-                      _selectedDuration = newValue ?? 20;
-                    });
-                  },
-                ),
-              ],
-            ),
+                ],
+              ),
             ElevatedButton(
               onPressed: isLeader
                   ? (allReadyExceptLeader ? _startGame : null)
                   : _updateReadyState,
-              child: Text(
-                  isLeader
-                      ? '게임 시작'
-                      : (_participants.firstWhere(
-                          (p) => p['userId'] == widget.userId,
-                          orElse: () => {'isReady': false})['isReady']
-                      ? '준비 해제'
-                      : '준비'),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Jua-Regular'
-                  ),
-              ), // userName 대신 userId 사용
+              child: Text(isLeader ? '게임 시작' : (_participants.firstWhere((p) => p['userId'] == widget.userId, orElse: () => {'isReady': false})['isReady'] ? '준비 해제' : '준비')), // userName 대신 userId 사용
             ),
           ],
         ),
