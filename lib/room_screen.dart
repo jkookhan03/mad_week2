@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:web_socket_channel/io.dart';
 import 'tab_game_screen.dart';
 import 'balloon_game_screen.dart';
+import 'star_game_screen.dart'; // star_game_screen 추가
 
 class RoomScreen extends StatefulWidget {
   final int roomId;
@@ -72,8 +73,16 @@ class _RoomScreenState extends State<RoomScreen> {
                   userName: widget.userName,
                   userId: widget.userId,
                 ); // 게임 시간 전달
-              } else {
+              } else if (_selectedGame == 'balloon_game') {
                 return BalloonGameScreen(
+                  duration: _selectedDuration,
+                  roomId: widget.roomId,
+                  roomName: widget.roomName,
+                  userName: widget.userName,
+                  userId: widget.userId,
+                ); // 게임 시간 전달
+              } else {
+                return StarGameScreen(
                   duration: _selectedDuration,
                   roomId: widget.roomId,
                   roomName: widget.roomName,
@@ -276,7 +285,7 @@ class _RoomScreenState extends State<RoomScreen> {
       }
     } catch (e) {
       print('Transfer leadership error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)..showSnackBar(
         SnackBar(content: Text('방장 권한을 넘기는 중 오류가 발생했습니다.')),
       );
     }
@@ -411,13 +420,61 @@ class _RoomScreenState extends State<RoomScreen> {
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                SizedBox(width: 10), // Star Game 버튼 추가
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedGame = 'star_game';
+                    });
+                  },
+                  child: Text('Star Game'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _selectedGame == 'star_game' ? Colors.blue : Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            // 게임 시간 선택 UI 추가
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('게임 시간: ', style: TextStyle(fontSize: 16)),
+                DropdownButton<int>(
+                  value: _selectedDuration,
+                  items: [10, 20, 30, 40, 50, 60].map((int value) {
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text('$value초'),
+                    );
+                  }).toList(),
+                  onChanged: (int? newValue) {
+                    setState(() {
+                      _selectedDuration = newValue ?? 20;
+                    });
+                  },
+                ),
+              ],
+            ),
             ElevatedButton(
               onPressed: isLeader
                   ? (allReadyExceptLeader ? _startGame : null)
                   : _updateReadyState,
-              child: Text(isLeader ? '게임 시작' : (_participants.firstWhere((p) => p['userId'] == widget.userId, orElse: () => {'isReady': false})['isReady'] ? '준비 해제' : '준비')), // userName 대신 userId 사용
+              child: Text(
+                isLeader
+                    ? '게임 시작'
+                    : (_participants.firstWhere(
+                        (p) => p['userId'] == widget.userId,
+                    orElse: () => {'isReady': false})['isReady']
+                    ? '준비 해제'
+                    : '준비'),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Jua-Regular'
+                ),
+              ), // userName 대신 userId 사용
             ),
           ],
         ),
