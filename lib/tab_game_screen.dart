@@ -51,6 +51,9 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
   void _endGame() async {
     final scores = await _sendScoreAndFetchRankings();
 
+    // 0.5초 딜레이 추가
+    await Future.delayed(Duration(milliseconds: 500));
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
