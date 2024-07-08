@@ -62,6 +62,35 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/red_balloon.png
+    - assets/yellow_balloon.png
+    - assets/green_balloon.png
+    - assets/blue_balloon.png
+    - assets/black_balloon.png
+    - assets/orange_balloon.png
+    - assets/pink_balloon.png
+    - assets/purple_balloon.png
+    - assets/grey_balloon.png
+    - assets/brown_balloon.png
+    - assets/lightblue_balloon.png
+    - assets/red_burst_balloon.png
+    - assets/yellow_burst_balloon.png
+    - assets/green_burst_balloon.png
+    - assets/blue_burst_balloon.png
+    - assets/black_burst_balloon.png
+    - assets/orange_burst_balloon.png
+    - assets/pink_burst_balloon.png
+    - assets/purple_burst_balloon.png
+    - assets/grey_burst_balloon.png
+    - assets/brown_burst_balloon.png
+    - assets/lightblue_burst_balloon.png
+
+  fonts:
+    - family: Jua-Regular
+      fonts:
+        - asset: assets/fonts/Jua-Regular.ttf
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
