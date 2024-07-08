@@ -3,15 +3,16 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:web_socket_channel/io.dart';
-import 'game_screen.dart';  // game_screen import 추가
+import 'tab_game_screen.dart';
+import 'balloon_game_screen.dart';
 
 class RoomScreen extends StatefulWidget {
   final int roomId;
   final String roomName;
   final String userName;
-  final String userId; // userId 추가
+  final String userId;
 
-  RoomScreen({required this.roomId, required this.roomName, required this.userName, required this.userId}); // userId 추가
+  RoomScreen({required this.roomId, required this.roomName, required this.userName, required this.userId});
 
   @override
   _RoomScreenState createState() => _RoomScreenState();
@@ -23,6 +24,9 @@ class _RoomScreenState extends State<RoomScreen> {
   String? _leaderId;
   Timer? _timer;
   late IOWebSocketChannel _channel;
+  String _selectedGame = 'tab_game'; // 기본값을 설정합니다.
+  int _selectedDuration = 20; // 기본 게임 시간 설정
+  bool _isGameStarted = false; // 게임 시작 플래그 추가
 
   @override
   void initState() {
@@ -34,7 +38,9 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   void dispose() {
-    _leaveRoom();
+    if (!_isGameStarted) { // 게임이 시작되지 않았을 때만 방에서 나가도록 수정
+      _leaveRoom();
+    }
     _timer?.cancel();
     _channel.sink.close();
     super.dispose();
@@ -50,10 +56,29 @@ class _RoomScreenState extends State<RoomScreen> {
     _channel.stream.listen((message) {
       final parsedMessage = jsonDecode(message);
       if (parsedMessage['type'] == 'game-started' && parsedMessage['roomId'] == widget.roomId) {
+        _isGameStarted = true; // 게임 시작 플래그 설정
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => GameScreen(),
+            builder: (context) {
+              if (_selectedGame == 'tab_game') {
+                return TabGameScreen(
+                  duration: _selectedDuration,
+                  roomId: widget.roomId,
+                  roomName: widget.roomName,
+                  userName: widget.userName,
+                  userId: widget.userId,
+                ); // 게임 시간 전달
+              } else {
+                return BalloonGameScreen(
+                  duration: _selectedDuration,
+                  roomId: widget.roomId,
+                  roomName: widget.roomName,
+                  userName: widget.userName,
+                  userId: widget.userId,
+                ); // 게임 시간 전달
+              }
+            },
           ),
         );
       }
@@ -64,6 +89,8 @@ class _RoomScreenState extends State<RoomScreen> {
     _channel.sink.add(jsonEncode({
       'type': 'start-game',
       'roomId': widget.roomId,
+      'game': _selectedGame, // 선택한 게임을 서버로 전송합니다.
+      'duration': _selectedDuration, // 선택한 게임 시간 서버로 전송
     }));
   }
 
@@ -219,7 +246,9 @@ class _RoomScreenState extends State<RoomScreen> {
 
     return WillPopScope(
       onWillPop: () async {
-        await _leaveRoom();
+        if (!_isGameStarted) { // 게임이 시작되지 않았을 때만 방에서 나가도록 수정
+          await _leaveRoom();
+        }
         return true;
       },
       child: Scaffold(
@@ -271,6 +300,57 @@ class _RoomScreenState extends State<RoomScreen> {
                   );
                 },
               ),
+            ),
+            // 게임 선택 UI 추가
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedGame = 'tab_game';
+                    });
+                  },
+                  child: Text('Tab Game'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _selectedGame == 'tab_game' ? Colors.blue : Colors.grey,
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedGame = 'balloon_game';
+                    });
+                  },
+                  child: Text('Balloon Game'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _selectedGame == 'balloon_game' ? Colors.blue : Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            // 게임 시간 선택 UI 추가
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('게임 시간: ', style: TextStyle(fontSize: 16)),
+                DropdownButton<int>(
+                  value: _selectedDuration,
+                  items: [10, 20, 30, 40, 50, 60].map((int value) {
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text('$value초'),
+                    );
+                  }).toList(),
+                  onChanged: (int? newValue) {
+                    setState(() {
+                      _selectedDuration = newValue ?? 20;
+                    });
+                  },
+                ),
+              ],
             ),
             ElevatedButton(
               onPressed: isLeader

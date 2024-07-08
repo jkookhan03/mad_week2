@@ -1,7 +1,9 @@
-// balloon_game_screen.dart
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'ranking_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Balloon {
   Color color;
@@ -11,12 +13,19 @@ class Balloon {
 }
 
 class BalloonGameScreen extends StatefulWidget {
+  final int duration;
+  final int roomId;
+  final String roomName;
+  final String userName;
+  final String userId;
+
+  BalloonGameScreen({required this.duration, required this.roomId, required this.roomName, required this.userName, required this.userId});
+
   @override
   _BalloonGameScreenState createState() => _BalloonGameScreenState();
 }
 
-class _BalloonGameScreenState extends State<BalloonGameScreen>
-    with SingleTickerProviderStateMixin {
+class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTickerProviderStateMixin {
   final List<Color> balloonColors = [
     Colors.red,
     Colors.yellow,
@@ -86,7 +95,7 @@ class _BalloonGameScreenState extends State<BalloonGameScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 20),
+      duration: Duration(seconds: widget.duration),
     )..addListener(() {
       setState(() {});
     })..addStatusListener((status) {
@@ -110,23 +119,44 @@ class _BalloonGameScreenState extends State<BalloonGameScreen>
     _controller.forward(from: 0.0);
   }
 
-  void _endGame() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('게임 종료'),
-        content: Text('점수: $score'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _startGame();
-            },
-            child: Text('다시 시작'),
-          ),
-        ],
+  void _endGame() async {
+    final scores = await _sendScoreAndFetchRankings();
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RankingScreen(
+          roomId: widget.roomId,
+          roomName: widget.roomName,
+          userName: widget.userName,
+          userId: widget.userId,
+          scores: scores,
+          gameName: 'Balloon Game', // gameName 추가
+        ),
       ),
     );
+  }
+
+  Future<List<Map<String, dynamic>>> _sendScoreAndFetchRankings() async {
+    final response = await http.post(
+      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/score'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'userId': widget.userId, 'score': score, 'gameName': 'Balloon Game'}), // gameName 추가
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to save score');
+    }
+
+    final scoresResponse = await http.get(
+      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores'),
+    );
+
+    if (scoresResponse.statusCode != 200) {
+      throw Exception('Failed to fetch scores');
+    }
+
+    return List<Map<String, dynamic>>.from(jsonDecode(scoresResponse.body));
   }
 
   void _generateBalloons() {
