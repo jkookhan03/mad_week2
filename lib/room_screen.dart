@@ -315,7 +315,15 @@ class _RoomScreenState extends State<RoomScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Room: ${widget.roomName}'),
+          title: Text(
+            'Room: ${widget.roomName}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.black,
+              fontFamily: 'Jua-Regular',
+            ),
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.refresh),
@@ -330,14 +338,22 @@ class _RoomScreenState extends State<RoomScreen> {
             SizedBox(height: 32),
             Text(
               '참가자 목록',
-              style: TextStyle(fontSize: 24),
+              style: TextStyle(
+                fontSize: 30,
+                fontFamily: 'Jua-Regular',
+              ),
             ),
+            SizedBox(height: 10),
             Expanded(
               child: _participants.isEmpty
                   ? Center(
                 child: Text(
                   '참가자가 없습니다.',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Jua-Regular',
+                  ),
                 ),
               )
                   : ListView.builder(
@@ -350,8 +366,27 @@ class _RoomScreenState extends State<RoomScreen> {
                   final displayName = isLeader ? '$userName (방장)' : userName;
 
                   return ListTile(
-                    title: Text(
-                      '$displayName ($readyStatus)',
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          displayName,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Jua-Regular',
+                            color: Colors.black,
+                          ),
+                        ),
+                        if (!isLeader) // 방장이 아닌 경우에만 준비 상태 표시
+                          Text(
+                            readyStatus,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: 'Jua-Regular',
+                              color: readyStatus == '준비됨' ? Colors.green : Colors.red,
+                            ),
+                          )
+                      ],
                     ),
                     trailing: isLeader && participant['userId'] != widget.userId // userName 대신 userId 사용
                         ? IconButton(
