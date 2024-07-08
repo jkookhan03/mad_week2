@@ -81,6 +81,10 @@ class _RoomScreenState extends State<RoomScreen> {
             },
           ),
         );
+      } else if (parsedMessage['type'] == 'participant-joined' && parsedMessage['roomId'] == widget.roomId) {
+        _fetchParticipants();  // 참가자가 들어오면 참가자 목록 새로고침
+      } else if (parsedMessage['type'] == 'participant-left' && parsedMessage['roomId'] == widget.roomId) {
+        _fetchParticipants();  // 참가자가 나가면 참가자 목록 새로고침
       }
     });
   }
@@ -268,14 +272,18 @@ class _RoomScreenState extends State<RoomScreen> {
             SizedBox(height: 32),
             Text(
               '참가자 목록',
-              style: TextStyle(fontSize: 24),
+              style: TextStyle(
+                  fontSize: 24,
+                  fontFamily: 'Jua-Regular'),
             ),
             Expanded(
               child: _participants.isEmpty
                   ? Center(
                 child: Text(
                   '참가자가 없습니다.',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Jua-Regular'),
                 ),
               )
                   : ListView.builder(
@@ -356,7 +364,20 @@ class _RoomScreenState extends State<RoomScreen> {
               onPressed: isLeader
                   ? (allReadyExceptLeader ? _startGame : null)
                   : _updateReadyState,
-              child: Text(isLeader ? '게임 시작' : (_participants.firstWhere((p) => p['userId'] == widget.userId, orElse: () => {'isReady': false})['isReady'] ? '준비 해제' : '준비')), // userName 대신 userId 사용
+              child: Text(
+                  isLeader
+                      ? '게임 시작'
+                      : (_participants.firstWhere(
+                          (p) => p['userId'] == widget.userId,
+                          orElse: () => {'isReady': false})['isReady']
+                      ? '준비 해제'
+                      : '준비'),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Jua-Regular'
+                  ),
+              ), // userName 대신 userId 사용
             ),
           ],
         ),

@@ -64,6 +64,8 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/btnG_login.png
+    - assets/btnG_logout.png
     - assets/KakaoTalk_20240706_235918320.png
     - assets/KakaoTalk_20240706_235918320_01.png
     - assets/red_balloon.png

@@ -310,7 +310,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -328,12 +327,38 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _roomNameController,
               decoration: InputDecoration(
                 labelText: '방 이름',
+                labelStyle: TextStyle(
+                  fontFamily: 'Jua-Regular',
+                  fontSize: 16,
+                ),
                 border: OutlineInputBorder(),
               ),
             ),
           ),
+          ElevatedButton(
+            onPressed: _createRoom,
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white, backgroundColor: Colors.grey, // 텍스트 색상
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), // 패딩
+              textStyle: TextStyle(
+                fontFamily: 'Jua-Regular', // 글꼴
+                fontSize: 16, // 글꼴 크기
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8), // 둥근 모서리
+              ),
+              elevation: 5, // 그림자 깊이
+            ),
+            child: Text('방 만들기'),
+          ),
           SwitchListTile(
-            title: Text('비밀방'),
+            title: Text(
+              '비밀방',
+              style: TextStyle(
+                fontFamily: 'Jua-Regular',
+                fontSize: 16,
+              ),
+            ),
             value: _isPrivate,
             onChanged: (bool value) {
               setState(() {
@@ -353,44 +378,48 @@ class _HomeScreenState extends State<HomeScreen> {
                 obscureText: true,
               ),
             ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _createRoom,
-            child: Text('방 만들기'),
-          ),
           SizedBox(height: 32),
           Text(
             '방 목록',
-            style: TextStyle(fontSize: 24),
+            style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Jua-Regular'),
           ),
           Expanded(
             child: _rooms.isEmpty
                 ? Center(
-              child: Text(
-                '게임 방이 없습니다.',
-                style: TextStyle(fontSize: 20),
-              ),
-            )
-                : ListView.builder(
-              itemCount: _rooms.length,
-              itemBuilder: (context, index) {
-                final room = _rooms[index];
-                return Card(
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: ListTile(
-                    title: Text(room['roomName']),
-                    onTap: () => _joinRoom(room['id'], room['roomName'], room['password'] != ''), // 비밀번호 여부 전달
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () => _deleteRoom(room['id']),
+                  child: Text(
+                    '게임 방이 없습니다.',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'Jua-Regular'
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                )
+                : ListView.builder(
+                  itemCount: _rooms.length,
+                  itemBuilder: (context, index) {
+                  final room = _rooms[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListTile(
+                      title: Text(room['roomName'],
+                        style: TextStyle(
+                          fontFamily: 'Jua-Regular',
+                        ),
+                      ),
+                      onTap: () => _joinRoom(room['id'], room['roomName'], room['password'] != ''), // 비밀번호 여부 전달
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () => _deleteRoom(room['id']),
+                      ),
+                   ),
+                 );
+               },
+             ),
+           ),
+         ],
+       ),
     );
   }
 }
