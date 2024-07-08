@@ -39,10 +39,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_naver_map: ^1.0.2
   flutter_naver_login: ^1.8.0
   shared_preferences: ^2.0.6
   http: ^0.13.4
+  provider: ^6.0.2
+  web_socket_channel: ^2.1.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -56,6 +57,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/KakaoTalk_20240706_235918320.png
+    - assets/KakaoTalk_20240706_235918320_01.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
