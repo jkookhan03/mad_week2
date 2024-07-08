@@ -56,29 +56,50 @@ class RankingScreen extends StatelessWidget {
     filteredScores.sort((a, b) => b['score'].compareTo(a['score'])); // 점수를 기준으로 내림차순 정렬
 
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Ranking'),
-            SizedBox(width: 8),
-            Text(
-              '($gameName)',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-          ],
-        ),
-      ),
       body: Column(
         children: [
+          SizedBox(height: 60),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '게임 결과',
+                style: TextStyle(
+                  fontFamily: 'Jua-Regular',
+                  fontSize: 30,
+                ),
+              ),
+              SizedBox(width: 8),
+              Text(
+                '($gameName)',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                  fontFamily: 'Jua-Regular',
+                ),
+              )
+            ],
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: filteredScores.length,
               itemBuilder: (context, index) {
                 final scoreEntry = filteredScores[index];
                 return ListTile(
-                  title: Text('${index + 1}. ${scoreEntry['userName']}'),
-                  trailing: Text('${scoreEntry['score']} 점'),
+                  title: Text(
+                      '${index + 1}. ${scoreEntry['userName']}',
+                      style: TextStyle(
+                        fontFamily: 'Jua-Regular',
+                        fontSize: 20,
+                      ),
+                  ),
+                  trailing: Text(
+                      '${scoreEntry['score']} 점',
+                      style: TextStyle(
+                        fontFamily: 'Jua-Regular',
+                        fontSize: 20,
+                      ),
+                  ),
                 );
               },
             ),
