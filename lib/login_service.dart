@@ -11,21 +11,25 @@ class LoginState with ChangeNotifier {
   String _accessToken = 'None';
   String _userId = 'None';
   String _userName = 'None';
+  String _profileImageUrl = 'None'; // 프로필 이미지 URL 저장
 
   String get accessToken => _accessToken;
   String get userId => _userId;
   String get userName => _userName;
+  String get profileImageUrl => _profileImageUrl; // getter 추가
 
   Future<void> checkAutoLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
     String? userName = prefs.getString('userName');
     String? token = prefs.getString('token');
+    String? profileImageUrl = prefs.getString('profileImageUrl'); // 프로필 이미지 URL 가져오기
 
-    if (userId != null && userName != null && token != null) {
+    if (userId != null && userName != null && token != null && profileImageUrl != null) {
       _userId = userId;
       _userName = userName;
       _accessToken = token;
+      _profileImageUrl = profileImageUrl;
       notifyListeners();
     }
   }
@@ -56,10 +60,12 @@ class LoginState with ChangeNotifier {
           prefs.setString('userId', accountResult.id);
           prefs.setString('userName', accountResult.name);
           prefs.setString('token', token.accessToken); // 토큰 저장
+          prefs.setString('profileImageUrl', accountResult.profileImage); // 프로필 이미지 URL 저장
 
           _accessToken = token.accessToken;
           _userId = accountResult.id;
           _userName = accountResult.name;
+          _profileImageUrl = accountResult.profileImage; // 프로필 이미지 URL 설정
           notifyListeners();
 
           return true;
@@ -79,10 +85,12 @@ class LoginState with ChangeNotifier {
     prefs.remove('userId');
     prefs.remove('userName');
     prefs.remove('token');
+    prefs.remove('profileImageUrl'); // 프로필 이미지 URL 제거
 
     _accessToken = 'None';
     _userId = 'None';
     _userName = 'None';
+    _profileImageUrl = 'None';
     notifyListeners();
   }
 }

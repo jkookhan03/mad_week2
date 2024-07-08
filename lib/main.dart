@@ -102,21 +102,26 @@ class UserScreen extends StatelessWidget {
                 SizedBox(height: 100),
                 Text(
                   '사용자 정보',
-                  style: TextStyle(fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Jua-Regular'),
+                  style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Jua-Regular'
+                  ),
                 ),
                 SizedBox(height: 20),
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: AssetImage('assets/profile_placeholder.png'), // Replace with user's profile image
+                  backgroundImage: loginState.profileImageUrl != 'None'
+                      ? NetworkImage(loginState.profileImageUrl)
+                      : AssetImage('assets/profile_placeholder.png'), // Replace with user's profile image
                 ),
                 SizedBox(height: 40),
                 Text(
                   '${loginState.userName}',
                   style: TextStyle(
                       fontSize: 20,
-                      fontFamily: 'Jua-Regular'),
+                      fontFamily: 'Jua-Regular'
+                  ),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -125,8 +130,7 @@ class UserScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  // '승률: ${loginState.userWinRate}%', // Add win rate if available
-                  '승률: ',
+                  '승률: ', // Add win rate if available
                   style: TextStyle(fontSize: 20),
                 ),
               ],
@@ -151,7 +155,6 @@ class UserScreen extends StatelessWidget {
   }
 }
 
-
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -171,9 +174,10 @@ class LoginScreen extends StatelessWidget {
                 }
               },
               child: Image.asset(
-                  'assets/btnG_login.png',
-                  width: 200,
-                  height: 50,),
+                'assets/btnG_login.png',
+                width: 200,
+                height: 50,
+              ),
             ),
           ],
         ),
