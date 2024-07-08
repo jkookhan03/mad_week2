@@ -61,6 +61,7 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
           userId: widget.userId,
           scores: scores,
           gameName: 'Tab Game', // gameName 추가
+          gameDuration: widget.duration, // gameDuration 추가
         ),
       ),
     );
@@ -70,7 +71,7 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
     final response = await http.post(
       Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/score'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': widget.userId, 'score': _score, 'gameName': 'Tab Game'}), // gameName 추가
+      body: jsonEncode({'userId': widget.userId, 'score': _score, 'gameName': 'Tab Game', 'duration': widget.duration}), // gameName 및 duration 추가
     );
 
     if (response.statusCode != 200) {
@@ -81,7 +82,7 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
     await Future.delayed(Duration(milliseconds: 500));
 
     final scoresResponse = await http.get(
-      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores'),
+      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Tab%20Game&duration=${widget.duration}'), // 게임 이름과 시간을 쿼리 파라미터로 전달
     );
 
     if (scoresResponse.statusCode != 200) {

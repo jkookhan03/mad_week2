@@ -1,9 +1,9 @@
-import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'ranking_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
+import 'dart:math';
 
 class Balloon {
   Color color;
@@ -132,6 +132,7 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
           userId: widget.userId,
           scores: scores,
           gameName: 'Balloon Game', // gameName 추가
+          gameDuration: widget.duration, // gameDuration 추가
         ),
       ),
     );
@@ -141,7 +142,7 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
     final response = await http.post(
       Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/score'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': widget.userId, 'score': score, 'gameName': 'Balloon Game'}), // gameName 추가
+      body: jsonEncode({'userId': widget.userId, 'score': score, 'gameName': 'Balloon Game', 'duration': widget.duration}), // gameName 및 duration 추가
     );
 
     if (response.statusCode != 200) {
@@ -152,7 +153,7 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
     await Future.delayed(Duration(milliseconds: 500));
 
     final scoresResponse = await http.get(
-      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores'),
+      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Balloon%20Game&duration=${widget.duration}'), // 게임 이름과 시간을 쿼리 파라미터로 전달
     );
 
     if (scoresResponse.statusCode != 200) {

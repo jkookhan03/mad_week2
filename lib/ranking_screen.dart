@@ -12,6 +12,7 @@ class RankingScreen extends StatelessWidget {
   final String userId;
   final List<Map<String, dynamic>> scores;
   final String gameName;
+  final int gameDuration; // 게임 시간을 추가합니다.
 
   RankingScreen({
     required this.roomId,
@@ -20,6 +21,7 @@ class RankingScreen extends StatelessWidget {
     required this.userId,
     required this.scores,
     required this.gameName,
+    required this.gameDuration,
   });
 
   Future<void> _leaveRoom(BuildContext context) async {
@@ -53,7 +55,8 @@ class RankingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final filteredScores = scores.where((score) => score['gameName'] == gameName).toList();
+    // 게임 종류와 시간으로 필터링
+    final filteredScores = scores.where((score) => score['gameName'] == gameName && score['duration'] == gameDuration).toList();
     filteredScores.sort((a, b) => b['score'].compareTo(a['score'])); // 점수를 기준으로 내림차순 정렬
 
     return Scaffold(
@@ -72,7 +75,7 @@ class RankingScreen extends StatelessWidget {
               ),
               SizedBox(width: 8),
               Text(
-                '($gameName)',
+                '($gameName - $gameDuration초)',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],

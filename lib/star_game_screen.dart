@@ -81,6 +81,7 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
           userId: widget.userId,
           scores: scores,
           gameName: 'Star Game',
+          gameDuration: widget.duration, // gameDuration 추가
         ),
       ),
     );
@@ -90,7 +91,7 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
     final response = await http.post(
       Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/score'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': widget.userId, 'score': _score, 'gameName': 'Star Game'}),
+      body: jsonEncode({'userId': widget.userId, 'score': _score, 'gameName': 'Star Game', 'duration': widget.duration}), // gameName 및 duration 추가
     );
 
     if (response.statusCode != 200) {
@@ -101,7 +102,7 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
     await Future.delayed(Duration(milliseconds: 500));
 
     final scoresResponse = await http.get(
-      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores'),
+      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Star%20Game&duration=${widget.duration}'), // 게임 이름과 시간을 쿼리 파라미터로 전달
     );
 
     if (scoresResponse.statusCode != 200) {
