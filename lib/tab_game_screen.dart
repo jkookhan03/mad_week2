@@ -51,9 +51,6 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
   void _endGame() async {
     final scores = await _sendScoreAndFetchRankings();
 
-    // 0.5초 딜레이 추가
-    await Future.delayed(Duration(milliseconds: 500));
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -79,6 +76,9 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
     if (response.statusCode != 200) {
       throw Exception('Failed to save score');
     }
+
+    // 0.5초 딜레이 추가
+    await Future.delayed(Duration(milliseconds: 500));
 
     final scoresResponse = await http.get(
       Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores'),
