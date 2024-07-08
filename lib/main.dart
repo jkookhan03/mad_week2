@@ -65,9 +65,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter App with Naver Login'),
-      ),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
@@ -94,32 +91,66 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loginState = Provider.of<LoginState>(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'User ID: ${loginState.userId}',
-            style: TextStyle(fontSize: 20),
-          ),
-          Text(
-            'User Name: ${loginState.userName}',
-            style: TextStyle(fontSize: 20),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              loginState.logout();
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => InitialScreen()),
-              );
-            },
-            child: Text('Logout'),
-          ),
-        ],
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                SizedBox(height: 100),
+                Text(
+                  '사용자 정보',
+                  style: TextStyle(fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Jua-Regular'),
+                ),
+                SizedBox(height: 20),
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/profile_placeholder.png'), // Replace with user's profile image
+                ),
+                SizedBox(height: 40),
+                Text(
+                  '${loginState.userName}',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Jua-Regular'),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  '유저 ID: ${loginState.userId}',
+                  style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  // '승률: ${loginState.userWinRate}%', // Add win rate if available
+                  '승률: ',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ],
+            ),
+            GestureDetector(
+              onTap: () {
+                loginState.logout();
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => InitialScreen()),
+                );
+              },
+              child: Image.asset(
+                'assets/btnG_logout.png',
+                width: 200,
+                height: 50,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -130,8 +161,8 @@ class LoginScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton(
-              onPressed: () async {
+            GestureDetector(
+              onTap: () async {
                 bool success = await loginState.login();
                 if (success) {
                   Navigator.of(context).pushReplacement(
@@ -139,7 +170,10 @@ class LoginScreen extends StatelessWidget {
                   );
                 }
               },
-              child: Text('Login with Naver'),
+              child: Image.asset(
+                  'assets/btnG_login.png',
+                  width: 200,
+                  height: 50,),
             ),
           ],
         ),
