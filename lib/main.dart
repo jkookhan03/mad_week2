@@ -91,64 +91,85 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loginState = Provider.of<LoginState>(context);
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              children: [
-                SizedBox(height: 100),
-                Text(
-                  '사용자 정보',
-                  style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Jua-Regular'
+        child: SingleChildScrollView( // SingleChildScrollView로 Column을 감싸기
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  SizedBox(height: 100),
+                  Text(
+                    '사용자 정보',
+                    style: TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Jua-Regular'
+                    ),
                   ),
-                ),
-                SizedBox(height: 20),
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: loginState.profileImageUrl != 'None'
-                      ? NetworkImage(loginState.profileImageUrl)
-                      : AssetImage('assets/profile_placeholder.png'), // Replace with user's profile image
-                ),
-                SizedBox(height: 40),
-                Text(
-                  '${loginState.userName}',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'Jua-Regular'
+                  SizedBox(height: 20),
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: loginState.profileImageUrl != 'None'
+                        ? NetworkImage(loginState.profileImageUrl)
+                        : AssetImage('assets/profile_placeholder.png'), // Replace with user's profile image
                   ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  '유저 ID: ${loginState.userId}',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  '승률: ', // Add win rate if available
-                  style: TextStyle(fontSize: 20),
-                ),
-              ],
-            ),
-            GestureDetector(
-              onTap: () {
-                loginState.logout();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (_) => InitialScreen()),
-                );
-              },
-              child: Image.asset(
-                'assets/btnG_logout.png',
-                width: 200,
-                height: 50,
+                  SizedBox(height: 40),
+                  Text(
+                    '${loginState.userName}',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'Jua-Regular'
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    '유저 ID: ${loginState.userId}',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    '승률: ', // Add win rate if available
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  // 최고 점수 표시
+                  SizedBox(height: 20),
+                  Text(
+                    '최고 점수',
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: loginState.highScores.length,
+                    itemBuilder: (context, index) {
+                      final highScore = loginState.highScores[index];
+                      return ListTile(
+                        title: Text('${highScore['gameName']} (${highScore['duration']}초)'),
+                        trailing: Text('${highScore['highScore']} 점'),
+                      );
+                    },
+                  ),
+                ],
               ),
-            ),
-          ],
+              GestureDetector(
+                onTap: () {
+                  loginState.logout();
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => InitialScreen()),
+                  );
+                },
+                child: Image.asset(
+                  'assets/btnG_logout.png',
+                  width: 200,
+                  height: 50,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
