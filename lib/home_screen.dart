@@ -396,6 +396,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+          '방 목록',
+          style: TextStyle(
+            fontFamily: 'Jua-Regular',
+            fontSize: 24,
+          ),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
@@ -407,14 +414,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ? Center(child: CircularProgressIndicator())
           : Column(
         children: [
-          SizedBox(height: 32),
-          Text(
-            '방 목록',
-            style: TextStyle(
-              fontSize: 24,
-              fontFamily: 'Jua-Regular',
-            ),
-          ),
           Expanded(
             child: _rooms.isEmpty
                 ? Center(

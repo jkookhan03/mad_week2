@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
       create: (context) => LoginState(),
       child: MaterialApp(
         home: InitialScreen(),
+        debugShowCheckedModeBanner: false,  // 이 줄을 추가하세요
       ),
     );
   }
