@@ -60,63 +60,78 @@ class _TotalRankingScreenState extends State<TotalRankingScreen> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Text(
-                    '게임: ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Jua-Regular',
-                    ),
-                  ),
-                  DropdownButton<String>(
-                    value: _selectedGame,
-                    items: games.map((game) {
-                      return DropdownMenuItem<String>(
-                        value: game,
-                        child: Text(
-                          game,
-                          style: TextStyle(fontFamily: 'Jua-Regular'),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedGame = newValue!;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    '게임 시간: ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Jua-Regular',
-                    ),
-                  ),
-                  DropdownButton<int>(
-                    value: _selectedDuration,
-                    items: [
-                      DropdownMenuItem(
-                        child: Text('10초',
-                            style: TextStyle(fontFamily: 'Jua-Regular')),
-                        value: 10,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '게임: ',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Jua-Regular',
+                            ),
+                          ),
+                          DropdownButton<String>(
+                            value: _selectedGame,
+                            items: games.map((game) {
+                              return DropdownMenuItem<String>(
+                                value: game,
+                                child: Text(
+                                  game,
+                                  style: TextStyle(fontFamily: 'Jua-Regular'),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedGame = newValue!;
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                      DropdownMenuItem(
-                        child: Text('20초',
-                            style: TextStyle(fontFamily: 'Jua-Regular')),
-                        value: 20,
-                      ),
-                      DropdownMenuItem(
-                        child: Text('30초',
-                            style: TextStyle(fontFamily: 'Jua-Regular')),
-                        value: 30,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '게임 시간: ',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Jua-Regular',
+                            ),
+                          ),
+                          DropdownButton<int>(
+                            value: _selectedDuration,
+                            items: [
+                              DropdownMenuItem(
+                                child: Text('10초',
+                                    style: TextStyle(fontFamily: 'Jua-Regular')),
+                                value: 10,
+                              ),
+                              DropdownMenuItem(
+                                child: Text('20초',
+                                    style: TextStyle(fontFamily: 'Jua-Regular')),
+                                value: 20,
+                              ),
+                              DropdownMenuItem(
+                                child: Text('30초',
+                                    style: TextStyle(fontFamily: 'Jua-Regular')),
+                                value: 30,
+                              ),
+                            ],
+                            onChanged: (int? newValue) {
+                              setState(() {
+                                _selectedDuration = newValue!;
+                              });
+                            },
+                          ),
+                        ],
                       ),
                     ],
-                    onChanged: (int? newValue) {
-                      setState(() {
-                        _selectedDuration = newValue!;
-                      });
-                    },
                   ),
+                  SizedBox(height: 20),
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
