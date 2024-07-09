@@ -117,7 +117,7 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
     _starPosition = _getRandomPosition();
     _positions.add(_starPosition);
 
-    _bombPositions = List.generate(5, (index) {
+    _bombPositions = List.generate(10, (index) {
       Offset position;
       do {
         position = _getRandomPosition();
@@ -129,7 +129,9 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
 
   Offset _getRandomPosition() {
     final double x = _random.nextDouble() * (_screenSize.width - _objectSize);
-    final double y = _random.nextDouble() * (_screenSize.height - _objectSize - 120) + 50; // 점수 텍스트 아래, 타이머 위
+    final double minY = 200;
+    final double maxY = _screenSize.height - _objectSize - 70;
+    final double y = _random.nextDouble() * (maxY - minY) + minY; // 점수 텍스트 아래, 타이머 위
     return Offset(x, y);
   }
 
@@ -159,15 +161,33 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Star Game'),
-      ),
       body: Stack(
         children: [
           Positioned(
-            top: 20,
-            left: 20,
-            child: Text('Score: $_score', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            top: 80,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Text(
+                  '별 먹기 게임',
+                  style: TextStyle(
+                      fontSize: 32,
+                      color: Colors.black,
+                      fontFamily: 'Jua-Regular',
+                  ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 150,
+            right: 20,
+            child: Text(
+                'Score: $_score',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: 'Jua-Regular',
+                ),
+            ),
           ),
           Positioned(
             left: _starPosition.dx,

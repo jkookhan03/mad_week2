@@ -108,9 +108,6 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Click Game'),
-      ),
       body: GestureDetector(
         onTap: _incrementScore,
         child: Container(
@@ -126,10 +123,32 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
                   alignment: Alignment.center,
                 ),
               ),
-              Center(
-                child: Text(
-                  'Score: $_score',
-                  style: TextStyle(fontSize: 40, color: Colors.black),
+              Positioned(
+                top: 80,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Text(
+                    '야옹',
+                    style: TextStyle(
+                      fontSize: 32,
+                      color: Colors.black,
+                      fontFamily: 'Jua-Regular',
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 150,
+                right: 20,
+                child: Center(
+                  child: Text(
+                    'Score: $_score',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'Jua-Regular',
+                    ),
+                  ),
                 ),
               ),
               Positioned(
