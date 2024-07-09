@@ -447,20 +447,51 @@ class _RoomScreenState extends State<RoomScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('게임 시간: ', style: TextStyle(fontSize: 16)),
-                      Slider(
-                        value: _selectedDuration.toDouble(),
-                        min: 10,
-                        max: 30,
-                        divisions: 2,
-                        label: '$_selectedDuration초',
-                        onChanged: (double newValue) {
+                      Text(
+                          '게임 시간: ',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Jua-Regular'
+                          ),
+                      ),
+                      DropdownButton<int>(
+                        value: _selectedDuration,
+                        items: [
+                          DropdownMenuItem(
+                              child: Text(
+                                '10초',
+                                style: TextStyle(
+                                  fontSize: 16, fontFamily: 'Jua-Regular'
+                                ),
+                              ),
+                            value: 10,
+                          ),
+                          DropdownMenuItem(
+                            child: Text(
+                              '20초',
+                              style: TextStyle(
+                                  fontSize: 16, fontFamily: 'Jua-Regular'
+                              ),
+                            ),
+                            value: 20,
+                          ),
+                          DropdownMenuItem(
+                            child: Text(
+                              '30초',
+                              style: TextStyle(
+                                  fontSize: 16, fontFamily: 'Jua-Regular'
+                              ),
+                            ),
+                            value: 30,
+                          ),
+                        ],
+                        onChanged: (int? newValue){
                           setState(() {
-                            _selectedDuration = newValue.toInt();
+                            _selectedDuration = newValue!;
                             _updateGameSettings();
                           });
                         },
-                      ),
+                      )
                     ],
                   ),
                 ],

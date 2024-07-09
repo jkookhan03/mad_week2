@@ -91,27 +91,37 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class UserScreen extends StatelessWidget {
+class UserScreen extends StatefulWidget {
+  @override
+  _UserScreenState createState() => _UserScreenState();
+}
+
+class _UserScreenState extends State<UserScreen> {
+  int _selectedDuration = 10;
+
   @override
   Widget build(BuildContext context) {
     final loginState = Provider.of<LoginState>(context);
 
+    // 선택한 duration에 따른 최고 점수 필터링
+    final filteredHighScores = loginState.highScores.where((score) => score['duration'] == _selectedDuration).toList();
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // SingleChildScrollView로 Column을 감싸기
+        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 children: [
-                  SizedBox(height: 100),
+                  SizedBox(height: 80),
                   Text(
                     '사용자 정보',
                     style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Jua-Regular'
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Jua-Regular',
                     ),
                   ),
                   SizedBox(height: 20),
@@ -119,40 +129,69 @@ class UserScreen extends StatelessWidget {
                     radius: 50,
                     backgroundImage: loginState.profileImageUrl != 'None'
                         ? NetworkImage(loginState.profileImageUrl)
-                        : AssetImage('assets/profile_placeholder.png'), // Replace with user's profile image
+                        : AssetImage('assets/profile_placeholder.png'),
                   ),
                   SizedBox(height: 40),
                   Text(
                     '${loginState.userName}',
                     style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Jua-Regular'
+                      fontSize: 20,
+                      fontFamily: 'Jua-Regular',
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Text(
-                    '유저 ID: ${loginState.userId}',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    '승률: ', // Add win rate if available
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  // 최고 점수 표시
                   SizedBox(height: 20),
                   Text(
                     '최고 점수',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Jua-Regular',
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    '게임 시간: ',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Jua-Regular',
+                    ),
+                  ),
+                  DropdownButton<int>(
+                    value: _selectedDuration,
+                    items: [
+                      DropdownMenuItem(
+                        child: Text('10초', style: TextStyle(fontFamily: 'Jua-Regular')),
+                        value: 10,
+                      ),
+                      DropdownMenuItem(
+                        child: Text('20초', style: TextStyle(fontFamily: 'Jua-Regular')),
+                        value: 20,
+                      ),
+                      DropdownMenuItem(
+                        child: Text('30초', style: TextStyle(fontFamily: 'Jua-Regular')),
+                        value: 30,
+                      ),
+                    ],
+                    onChanged: (int? newValue) {
+                      setState(() {
+                        _selectedDuration = newValue!;
+                      });
+                    },
                   ),
                   ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: loginState.highScores.length,
+                    itemCount: filteredHighScores.length,
                     itemBuilder: (context, index) {
-                      final highScore = loginState.highScores[index];
+                      final highScore = filteredHighScores[index];
                       return ListTile(
-                        title: Text('${highScore['gameName']} (${highScore['duration']}초)'),
+                        title: Text(
+                          '${highScore['gameName']} (${highScore['duration']}초)',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Jua-Regular',
+                          ),
+                        ),
                         trailing: Text('${highScore['highScore']} 점'),
                       );
                     },
