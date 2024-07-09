@@ -12,12 +12,14 @@ class LoginState with ChangeNotifier {
   String _userName = 'None';
   String _profileImageUrl = 'None';
   List<Map<String, dynamic>> _highScores = [];
+  List<Map<String, dynamic>> _rankings = [];  // rankings 리스트 추가
 
   String get accessToken => _accessToken;
   String get userId => _userId;
   String get userName => _userName;
   String get profileImageUrl => _profileImageUrl;
   List<Map<String, dynamic>> get highScores => _highScores;
+  List<Map<String, dynamic>> get rankings => _rankings;  // rankings getter 추가
 
   Future<void> checkAutoLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -32,6 +34,7 @@ class LoginState with ChangeNotifier {
       _accessToken = token;
       _profileImageUrl = profileImageUrl;
       await fetchHighScores(); // Fetch high scores after auto login
+      await fetchRankings();  // Fetch rankings after auto login
       notifyListeners();
     }
   }
@@ -50,6 +53,24 @@ class LoginState with ChangeNotifier {
       }
     } catch (e) {
       print('Error fetching high scores: $e');
+    }
+    notifyListeners();
+  }
+
+  Future<void> fetchRankings() async {
+    final url = 'http://172.10.7.88:80/api/rankings';
+    print('Fetching rankings from $url');
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        _rankings = List<Map<String, dynamic>>.from(json.decode(response.body));
+        print('Rankings fetched successfully: $_rankings');
+      } else {
+        print('Failed to fetch rankings: ${response.statusCode} ${response.body}');
+      }
+    } catch (e) {
+      print('Error fetching rankings: $e');
     }
     notifyListeners();
   }
@@ -87,6 +108,7 @@ class LoginState with ChangeNotifier {
           _userName = accountResult.name;
           _profileImageUrl = accountResult.profileImage;
           await fetchHighScores(); // Fetch high scores after login
+          await fetchRankings();  // Fetch rankings after login
           notifyListeners();
 
           return true;
@@ -113,6 +135,7 @@ class LoginState with ChangeNotifier {
     _userName = 'None';
     _profileImageUrl = 'None';
     _highScores = [];
+    _rankings = [];  // Clear rankings on logout
     notifyListeners();
   }
 }

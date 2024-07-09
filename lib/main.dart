@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'login_service.dart';
 import 'home_screen.dart';
+import 'total_ranking_screen.dart'; // Import the new file
 
 void main() {
   runApp(MyApp());
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       create: (context) => LoginState(),
       child: MaterialApp(
         home: InitialScreen(),
-        debugShowCheckedModeBanner: false,  // 이 줄을 추가하세요
+        debugShowCheckedModeBanner: false,
       ),
     );
   }
@@ -55,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     UserScreen(),
+    TotalRankingScreen(), // RankingScreen 추가
   ];
 
   void _onItemTapped(int index) {
@@ -64,6 +66,9 @@ class _MyHomePageState extends State<MyHomePage> {
     if (index == 1) {
       final loginState = Provider.of<LoginState>(context, listen: false);
       loginState.fetchHighScores(); // Fetch high scores when User tab is selected
+    } else if (index == 2) {
+      final loginState = Provider.of<LoginState>(context, listen: false);
+      loginState.fetchRankings(); // Fetch rankings when Ranking tab is selected
     }
   }
 
@@ -82,6 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'User',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.leaderboard),
+            label: 'Ranking',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -161,15 +170,18 @@ class _UserScreenState extends State<UserScreen> {
                     value: _selectedDuration,
                     items: [
                       DropdownMenuItem(
-                        child: Text('10초', style: TextStyle(fontFamily: 'Jua-Regular')),
+                        child: Text('10초',
+                            style: TextStyle(fontFamily: 'Jua-Regular')),
                         value: 10,
                       ),
                       DropdownMenuItem(
-                        child: Text('20초', style: TextStyle(fontFamily: 'Jua-Regular')),
+                        child: Text('20초',
+                            style: TextStyle(fontFamily: 'Jua-Regular')),
                         value: 20,
                       ),
                       DropdownMenuItem(
-                        child: Text('30초', style: TextStyle(fontFamily: 'Jua-Regular')),
+                        child: Text('30초',
+                            style: TextStyle(fontFamily: 'Jua-Regular')),
                         value: 30,
                       ),
                     ],
