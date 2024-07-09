@@ -408,76 +408,94 @@ class _RoomScreenState extends State<RoomScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton(
-                        onPressed: () {
+                      ToggleButtons(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text('Tab Game'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text('Balloon Game'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text('Star Game'),
+                          ),
+                        ],
+                        isSelected: [
+                          _selectedGame == 'tab_game',
+                          _selectedGame == 'balloon_game',
+                          _selectedGame == 'star_game',
+                        ],
+                        onPressed: (int index) {
                           setState(() {
-                            _selectedGame = 'tab_game';
+                            if (index == 0) {
+                              _selectedGame = 'tab_game';
+                            } else if (index == 1) {
+                              _selectedGame = 'balloon_game';
+                            } else if (index == 2) {
+                              _selectedGame = 'star_game';
+                            }
+                            _updateGameSettings();
                           });
-                          _updateGameSettings();
                         },
-                        child: Text('Tab Game'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedGame == 'tab_game' ? Colors.blue : Colors.grey,
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedGame = 'balloon_game';
-                          });
-                          _updateGameSettings();
-                        },
-                        child: Text('Balloon Game'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedGame == 'balloon_game' ? Colors.blue : Colors.grey,
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedGame = 'star_game';
-                          });
-                          _updateGameSettings();
-                        },
-                        child: Text('Star Game'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _selectedGame == 'star_game' ? Colors.blue : Colors.grey,
-                        ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('게임 시간: ', style: TextStyle(fontSize: 16)),
-                      DropdownButton<int>(
-                        value: _selectedDuration,
-                        items: [10, 20, 30].map((int value) {
-                          return DropdownMenuItem<int>(
-                            value: value,
-                            child: Text('$value초'),
-                          );
-                        }).toList(),
-                        onChanged: (int? newValue) {
+                      Slider(
+                        value: _selectedDuration.toDouble(),
+                        min: 10,
+                        max: 30,
+                        divisions: 2,
+                        label: '$_selectedDuration초',
+                        onChanged: (double newValue) {
                           setState(() {
-                            _selectedDuration = newValue ?? 20;
+                            _selectedDuration = newValue.toInt();
+                            _updateGameSettings();
                           });
-                          _updateGameSettings();
                         },
                       ),
                     ],
                   ),
                 ],
               ),
-            ElevatedButton(
-              onPressed: isLeader
-                  ? (allReadyExceptLeader ? _startGame : null)
-                  : _updateReadyState,
-              child: Text(isLeader ? '게임 시작' : (_participants.firstWhere((p) => p['userId'] == widget.userId, orElse: () => {'isReady': false})['isReady'] ? '준비 해제' : '준비')),
-            ),
+            Container(
+              width: double.infinity, // 가로 전체에 퍼지게 하기
+              margin: EdgeInsets.only(bottom: 20.0), // 아래에서 위로 띄우기
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: ElevatedButton(
+                onPressed: isLeader
+                    ? (allReadyExceptLeader ? _startGame : null)
+                    : _updateReadyState,
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white, backgroundColor: Colors.grey,
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  textStyle: TextStyle(
+                    fontFamily: 'Jua-Regular',
+                    fontSize: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8), // 둥근 모서리
+                  ),
+                  elevation: 5, // 그림자 깊이
+                ),
+                child: Text(
+                  isLeader
+                      ? '게임 시작'
+                      : (_participants.firstWhere(
+                          (p) => p['userId'] == widget.userId,
+                      orElse: () => {'isReady': false})['isReady']
+                      ? '준비 해제'
+                      : '준비'),
+                ),
+              ),
+            )
           ],
         ),
       ),
