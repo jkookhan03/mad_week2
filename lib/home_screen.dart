@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 import 'room_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -306,6 +307,91 @@ class _HomeScreenState extends State<HomeScreen> {
     return prefs.getString('userName');
   }
 
+  void _showCreateRoomBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: MediaQuery.of(context).viewInsets,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextField(
+                      controller: _roomNameController,
+                      decoration: InputDecoration(
+                        labelText: '방 이름',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Jua-Regular',
+                          fontSize: 16,
+                        ),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  SwitchListTile(
+                    title: Text(
+                      '비밀방',
+                      style: TextStyle(
+                        fontFamily: 'Jua-Regular',
+                        fontSize: 16,
+                      ),
+                    ),
+                    value: _isPrivate,
+                    onChanged: (bool value) {
+                      setModalState(() {
+                        _isPrivate = value;
+                      });
+                      if (_isPrivate) {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                      }
+                    },
+                  ),
+                  if (_isPrivate)
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: '비밀번호',
+                          border: OutlineInputBorder(),
+                        ),
+                        obscureText: true,
+                      ),
+                    ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _createRoom();
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.grey,
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      textStyle: TextStyle(
+                        fontFamily: 'Jua-Regular',
+                        fontSize: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: Text('확인'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -321,105 +407,54 @@ class _HomeScreenState extends State<HomeScreen> {
           ? Center(child: CircularProgressIndicator())
           : Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _roomNameController,
-              decoration: InputDecoration(
-                labelText: '방 이름',
-                labelStyle: TextStyle(
-                  fontFamily: 'Jua-Regular',
-                  fontSize: 16,
-                ),
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _createRoom,
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white, backgroundColor: Colors.grey, // 텍스트 색상
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12), // 패딩
-              textStyle: TextStyle(
-                fontFamily: 'Jua-Regular', // 글꼴
-                fontSize: 16, // 글꼴 크기
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8), // 둥근 모서리
-              ),
-              elevation: 5, // 그림자 깊이
-            ),
-            child: Text('방 만들기'),
-          ),
-          SwitchListTile(
-            title: Text(
-              '비밀방',
-              style: TextStyle(
-                fontFamily: 'Jua-Regular',
-                fontSize: 16,
-              ),
-            ),
-            value: _isPrivate,
-            onChanged: (bool value) {
-              setState(() {
-                _isPrivate = value;
-              });
-            },
-          ),
-          if (_isPrivate)
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: '비밀번호',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
-              ),
-            ),
           SizedBox(height: 32),
           Text(
             '방 목록',
             style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Jua-Regular'),
+              fontSize: 24,
+              fontFamily: 'Jua-Regular',
+            ),
           ),
           Expanded(
             child: _rooms.isEmpty
                 ? Center(
-                  child: Text(
-                    '게임 방이 없습니다.',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Jua-Regular'
+              child: Text(
+                '게임 방이 없습니다.',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontFamily: 'Jua-Regular',
+                ),
+              ),
+            )
+                : ListView.builder(
+              itemCount: _rooms.length,
+              itemBuilder: (context, index) {
+                final room = _rooms[index];
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: ListTile(
+                    title: Text(
+                      room['roomName'],
+                      style: TextStyle(
+                        fontFamily: 'Jua-Regular',
+                      ),
+                    ),
+                    onTap: () => _joinRoom(room['id'], room['roomName'], room['password'] != ''),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => _deleteRoom(room['id']),
                     ),
                   ),
-                )
-                : ListView.builder(
-                  itemCount: _rooms.length,
-                  itemBuilder: (context, index) {
-                  final room = _rooms[index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    child: ListTile(
-                      title: Text(room['roomName'],
-                        style: TextStyle(
-                          fontFamily: 'Jua-Regular',
-                        ),
-                      ),
-                      onTap: () => _joinRoom(room['id'], room['roomName'], room['password'] != ''), // 비밀번호 여부 전달
-                      trailing: IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () => _deleteRoom(room['id']),
-                      ),
-                   ),
-                 );
-               },
-             ),
-           ),
-         ],
-       ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showCreateRoomBottomSheet(context),
+        child: Icon(Icons.add),
+      ),
     );
   }
 }

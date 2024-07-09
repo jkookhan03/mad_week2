@@ -60,6 +60,10 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedIndex = index;
     });
+    if (index == 1) {
+      final loginState = Provider.of<LoginState>(context, listen: false);
+      loginState.fetchHighScores(); // Fetch high scores when User tab is selected
+    }
   }
 
   @override
