@@ -108,30 +108,64 @@ class RankingScreen extends StatelessWidget {
               },
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () => _leaveRoom(context), // 로비로 나가기 전에 방 나가기 요청을 보냅니다.
-                child: Text('로비로 나가기'),
-              ),
-              SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => RoomScreen(
-                      roomId: roomId,
-                      roomName: roomName,
-                      userName: userName,
-                      userId: userId,
-                    )),
-                        (Route<dynamic> route) => false,
-                  );
-                },
-                child: Text('게임 다시하기'),
-              ),
-            ],
+          Container(
+            width: double.infinity, // 가로 전체에 퍼지게 하기
+            margin: EdgeInsets.only(bottom: 20.0), // 아래에서 위로 띄우기
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _leaveRoom(context), // 로비로 나가기 전에 방 나가기 요청을 보냅니다.
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.grey,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      textStyle: TextStyle(
+                        fontFamily: 'Jua-Regular',
+                        fontSize: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8), // 둥근 모서리
+                      ),
+                      elevation: 5, // 그림자 깊이
+                    ),
+                    child: Text('로비로 나가기'),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => RoomScreen(
+                          roomId: roomId,
+                          roomName: roomName,
+                          userName: userName,
+                          userId: userId,
+                        )),
+                            (Route<dynamic> route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.grey,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      textStyle: TextStyle(
+                        fontFamily: 'Jua-Regular',
+                        fontSize: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8), // 둥근 모서리
+                      ),
+                      elevation: 5, // 그림자 깊이
+                    ),
+                    child: Text('게임 다시하기'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
