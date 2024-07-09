@@ -453,6 +453,11 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCreateRoomBottomSheet(context),
         child: Icon(Icons.add),
+        backgroundColor: Colors.grey,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        )
       ),
     );
   }
