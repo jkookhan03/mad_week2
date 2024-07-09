@@ -89,6 +89,8 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
   Color decoyTextColor = Colors.black;
   int score = 0;
   late AnimationController _controller;
+  bool _isCountdown = true;
+  int _countdownValue = 3;
 
   @override
   void initState() {
@@ -103,7 +105,27 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
         _endGame();
       }
     });
-    _startGame();
+    _startCountdown();
+  }
+
+  void _startCountdown() {
+    _countdown();
+  }
+
+  void _countdown() {
+    if (_countdownValue > 0) {
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          _countdownValue--;
+        });
+        _countdown();
+      });
+    } else {
+      setState(() {
+        _isCountdown = false;
+      });
+      _startGame();
+    }
   }
 
   @override
@@ -131,8 +153,8 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
           userName: widget.userName,
           userId: widget.userId,
           scores: scores,
-          gameName: 'Balloon Game', // gameName 추가
-          gameDuration: widget.duration, // gameDuration 추가
+          gameName: 'Balloon Game',
+          gameDuration: widget.duration,
         ),
       ),
     );
@@ -142,18 +164,17 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
     final response = await http.post(
       Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/score'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': widget.userId, 'score': score, 'gameName': 'Balloon Game', 'duration': widget.duration}), // gameName 및 duration 추가
+      body: jsonEncode({'userId': widget.userId, 'score': score, 'gameName': 'Balloon Game', 'duration': widget.duration}),
     );
 
     if (response.statusCode != 200) {
       throw Exception('Failed to save score');
     }
 
-    // 0.5초 딜레이 추가
     await Future.delayed(Duration(milliseconds: 500));
 
     final scoresResponse = await http.get(
-      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Balloon%20Game&duration=${widget.duration}'), // 게임 이름과 시간을 쿼리 파라미터로 전달
+      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Balloon%20Game&duration=${widget.duration}'),
     );
 
     if (scoresResponse.statusCode != 200) {
@@ -189,7 +210,6 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
       targetColorName = colorNames[targetIndex];
       targetTextColor = balloonColors[targetIndex];
 
-      // 미끼 색상 이름 설정
       int decoyIndex;
       do {
         decoyIndex = random.nextInt(colorNames.length);
@@ -225,95 +245,116 @@ class _BalloonGameScreenState extends State<BalloonGameScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          SizedBox(height: 60),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              '풍선 게임',
-              style: TextStyle(
-                fontSize: 32,
-                fontFamily: 'Jua-Regular',
-              ),
-            ),
-          ),
-          Center(
-            child: Text(
-              targetColorName,
-              style: TextStyle(
-                color: decoyTextColor,
-                fontSize: 40,
-                fontFamily: 'Jua-Regular',
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '',
+          Column(
+            children: [
+              SizedBox(height: 60),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  '풍선 게임',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 32,
                     fontFamily: 'Jua-Regular',
                   ),
                 ),
-                Text(
-                  'Score: $score',
+              ),
+              Center(
+                child: Text(
+                  targetColorName,
                   style: TextStyle(
-                    fontSize: 20,
+                    color: decoyTextColor,
+                    fontSize: 40,
                     fontFamily: 'Jua-Regular',
                   ),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8.0),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
               ),
-              itemCount: balloons.length,
-              itemBuilder: (context, index) {
-                final balloon = balloons[index];
-                final colorIndex = balloonColors.indexOf(balloon.color);
-                final colorName = colorNames[colorIndex];
-                final balloonImage = balloon.isBursting
-                    ? colorToBurstImage[colorName]!
-                    : colorToImage[colorName]!;
-
-                return GestureDetector(
-                  onTap: () => _checkBalloon(index),
-                  child: Transform.scale(
-                    scale: 0.8,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage(balloonImage),
-                          fit: BoxFit.contain,
-                        ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'Jua-Regular',
                       ),
                     ),
+                    Text(
+                      'Score: $score',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'Jua-Regular',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(8.0),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 8.0,
+                    crossAxisSpacing: 8.0,
                   ),
-                );
-              },
-            ),
+                  itemCount: balloons.length,
+                  itemBuilder: (context, index) {
+                    final balloon = balloons[index];
+                    final colorIndex = balloonColors.indexOf(balloon.color);
+                    final colorName = colorNames[colorIndex];
+                    final balloonImage = balloon.isBursting
+                        ? colorToBurstImage[colorName]!
+                        : colorToImage[colorName]!;
+
+                    return GestureDetector(
+                      onTap: _isCountdown ? null : () => _checkBalloon(index),
+                      child: Transform.scale(
+                        scale: 0.8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: AssetImage(balloonImage),
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Container(
+                height: 20,
+                width: double.infinity,
+                child: LinearProgressIndicator(
+                  value: _controller.value,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                ),
+              ),
+            ],
           ),
-          Container(
-            height: 20,
-            width: double.infinity,
-            child: LinearProgressIndicator(
-              value: _controller.value,
-              backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+          if (_isCountdown)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black54,
+                child: Center(
+                  child: Text(
+                    '$_countdownValue',
+                    style: TextStyle(
+                      fontSize: 100,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Jua-Regular', // 추가된 글꼴 설정
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );

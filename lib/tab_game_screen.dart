@@ -20,6 +20,8 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
   int _score = 0;
   bool _isTapped = false;
   late AnimationController _controller;
+  bool _isCountdown = true;
+  int _countdownValue = 3;
 
   @override
   void initState() {
@@ -34,7 +36,27 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
         _endGame();
       }
     });
-    _startGame();
+    _startCountdown();
+  }
+
+  void _startCountdown() {
+    _countdown();
+  }
+
+  void _countdown() {
+    if (_countdownValue > 0) {
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          _countdownValue--;
+        });
+        _countdown();
+      });
+    } else {
+      setState(() {
+        _isCountdown = false;
+      });
+      _startGame();
+    }
   }
 
   @override
@@ -60,8 +82,8 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
           userName: widget.userName,
           userId: widget.userId,
           scores: scores,
-          gameName: 'Tab Game', // gameName 추가
-          gameDuration: widget.duration, // gameDuration 추가
+          gameName: 'Tab Game',
+          gameDuration: widget.duration,
         ),
       ),
     );
@@ -71,18 +93,17 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
     final response = await http.post(
       Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/score'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': widget.userId, 'score': _score, 'gameName': 'Tab Game', 'duration': widget.duration}), // gameName 및 duration 추가
+      body: jsonEncode({'userId': widget.userId, 'score': _score, 'gameName': 'Tab Game', 'duration': widget.duration}),
     );
 
     if (response.statusCode != 200) {
       throw Exception('Failed to save score');
     }
 
-    // 0.5초 딜레이 추가
     await Future.delayed(Duration(milliseconds: 500));
 
     final scoresResponse = await http.get(
-      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Tab%20Game&duration=${widget.duration}'), // 게임 이름과 시간을 쿼리 파라미터로 전달
+      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Tab%20Game&duration=${widget.duration}'),
     );
 
     if (scoresResponse.statusCode != 200) {
@@ -109,7 +130,7 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       body: GestureDetector(
-        onTap: _incrementScore,
+        onTap: _isCountdown ? null : _incrementScore,
         child: Container(
           color: Colors.white,
           child: Stack(
@@ -165,6 +186,23 @@ class _TabGameScreenState extends State<TabGameScreen> with SingleTickerProvider
                   ),
                 ),
               ),
+              if (_isCountdown)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Text(
+                        '$_countdownValue',
+                        style: TextStyle(
+                          fontSize: 100,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Jua-Regular',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

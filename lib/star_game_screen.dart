@@ -29,10 +29,12 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
   late AnimationController _controller;
   final Random _random = Random();
   final double _objectSize = 70.0; // 별과 폭탄의 크기
-  late Offset _starPosition;
-  late List<Offset> _bombPositions;
+  late Offset _starPosition = Offset.zero;
+  late List<Offset> _bombPositions = [];
   List<Offset> _positions = [];
   late Size _screenSize;
+  bool _isCountdown = true;
+  int _countdownValue = 3;
 
   @override
   void initState() {
@@ -47,13 +49,36 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
         _endGame();
       }
     });
+    _startCountdown();
+  }
+
+  void _startCountdown() {
+    _countdown();
+  }
+
+  void _countdown() {
+    if (_countdownValue > 0) {
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() {
+          _countdownValue--;
+        });
+        _countdown();
+      });
+    } else {
+      setState(() {
+        _isCountdown = false;
+      });
+      _startGame();
+    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _screenSize = MediaQuery.of(context).size;
-    _startGame();
+    if (!_isCountdown) {
+      _startGame();
+    }
   }
 
   @override
@@ -81,7 +106,7 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
           userId: widget.userId,
           scores: scores,
           gameName: 'Star Game',
-          gameDuration: widget.duration, // gameDuration 추가
+          gameDuration: widget.duration,
         ),
       ),
     );
@@ -91,18 +116,17 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
     final response = await http.post(
       Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/score'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': widget.userId, 'score': _score, 'gameName': 'Star Game', 'duration': widget.duration}), // gameName 및 duration 추가
+      body: jsonEncode({'userId': widget.userId, 'score': _score, 'gameName': 'Star Game', 'duration': widget.duration}),
     );
 
     if (response.statusCode != 200) {
       throw Exception('Failed to save score');
     }
 
-    // 0.5초 딜레이 추가
     await Future.delayed(Duration(milliseconds: 500));
 
     final scoresResponse = await http.get(
-      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Star%20Game&duration=${widget.duration}'), // 게임 이름과 시간을 쿼리 파라미터로 전달
+      Uri.parse('http://172.10.7.88:80/api/rooms/${widget.roomId}/scores?gameName=Star%20Game&duration=${widget.duration}'),
     );
 
     if (scoresResponse.statusCode != 200) {
@@ -129,8 +153,8 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
 
   Offset _getRandomPosition() {
     final double x = _random.nextDouble() * (_screenSize.width - _objectSize);
-    final double minY = 200;
-    final double maxY = _screenSize.height - _objectSize - 70;
+    final double minY = 10;
+    final double maxY = _screenSize.height - _objectSize - 200;
     final double y = _random.nextDouble() * (maxY - minY) + minY; // 점수 텍스트 아래, 타이머 위
     return Offset(x, y);
   }
@@ -145,17 +169,21 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
   }
 
   void _onStarTapped() {
-    setState(() {
-      _score++;
-      _generatePositions();
-    });
+    if (!_isCountdown) {
+      setState(() {
+        _score++;
+        _generatePositions();
+      });
+    }
   }
 
   void _onBombTapped() {
-    setState(() {
-      _score--;
-      _generatePositions();
-    });
+    if (!_isCountdown) {
+      setState(() {
+        _score--;
+        _generatePositions();
+      });
+    }
   }
 
   @override
@@ -163,63 +191,86 @@ class _StarGameScreenState extends State<StarGameScreen> with SingleTickerProvid
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
+          Column(
+            children: [
+              SizedBox(height: 80),
+              Center(
+                child: Text(
                   '별 먹기 게임',
                   style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.black,
-                      fontFamily: 'Jua-Regular',
-                  ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 150,
-            right: 20,
-            child: Text(
-                'Score: $_score',
-                style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 32,
+                    color: Colors.black,
                     fontFamily: 'Jua-Regular',
+                  ),
                 ),
-            ),
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(right: 20.0), // 오른쪽에 약간의 간격 추가
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    'Score: $_score',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Jua-Regular',
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Stack(
+                  children: [
+                    if (!_isCountdown)
+                      Positioned(
+                        left: _starPosition.dx,
+                        top: _starPosition.dy,
+                        child: GestureDetector(
+                          onTap: _onStarTapped,
+                          child: Image.asset('assets/star.png', width: _objectSize, height: _objectSize),
+                        ),
+                      ),
+                    if (!_isCountdown)
+                      for (Offset position in _bombPositions)
+                        Positioned(
+                          left: position.dx,
+                          top: position.dy,
+                          child: GestureDetector(
+                            onTap: _onBombTapped,
+                            child: Image.asset('assets/bomb.png', width: _objectSize, height: _objectSize),
+                          ),
+                        ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 20,
+                width: double.infinity,
+                child: LinearProgressIndicator(
+                  value: _controller.value,
+                  backgroundColor: Colors.grey[300],
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                ),
+              ),
+            ],
           ),
-          Positioned(
-            left: _starPosition.dx,
-            top: _starPosition.dy,
-            child: GestureDetector(
-              onTap: _onStarTapped,
-              child: Image.asset('assets/star.png', width: _objectSize, height: _objectSize),
-            ),
-          ),
-          for (Offset position in _bombPositions)
-            Positioned(
-              left: position.dx,
-              top: position.dy,
-              child: GestureDetector(
-                onTap: _onBombTapped,
-                child: Image.asset('assets/bomb.png', width: _objectSize, height: _objectSize),
+          if (_isCountdown)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black54,
+                child: Center(
+                  child: Text(
+                    '$_countdownValue',
+                    style: TextStyle(
+                      fontSize: 100,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Jua-Regular', // 추가된 글꼴 설정
+                    ),
+                  ),
+                ),
               ),
             ),
-          Positioned(
-            bottom: 20,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 20,
-              width: double.infinity,
-              child: LinearProgressIndicator(
-                value: _controller.value,
-                backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-              ),
-            ),
-          ),
         ],
       ),
     );
