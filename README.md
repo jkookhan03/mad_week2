@@ -110,7 +110,39 @@
 `fetchRankings` 메서드는 서버로부터 전체 랭킹 데이터를 가져와 `_rankings` 리스트에 저장하는 기능을 합니다. 이 메서드는 HTTP GET 요청을 통해 데이터를 받아오고, 상태 변화를 알리기 위해 `notifyListeners()`를 호출합니다.
 
 ## API 명세서
-https://www.notion.so/madcamp/9fa6ca9e833f471397590eb3cb294a76?v=0edc088b5ac4442289ab2719bcfcff90&pvs=4
+
+### 서버 기본 정보
+
+- 기본 URL: `http://172.10.7.88`
+- 포트: 80
+
+### 공통 응답 코드
+
+- **200**: 성공
+- **201**: 생성됨
+- **400**: 잘못된 요청
+- **403**: 접근 금지
+- **404**: 찾을 수 없음
+- **500**: 서버 오류
+
+### 몰락실 API 명세서
+| 기능 | HTTP method | API path | Request | Response |
+| --- | --- | --- | --- | --- |
+| 로그인 | POST | /login | { "userId": "string", "userName": "string" } | { "status": "loggedIn" \| "registered", "userId": "string", "userName": "string" } |
+| 방 생성 | POST | /api/rooms | { "roomName": "string", "userId": "string", "userName": "string", "password": "string" (optional) } | { "status": "Room created", "roomId": "integer", "roomName": "string" } |
+| 방 참가 | POST | /api/rooms/:id/join | { "userId": "string", "userName": "string", "password": "string" (optional) } | { "status": "User joined", "roomId": "integer", "userId": "string", "userName": "string", "isLeader": "boolean" } |
+| 준비 상태 업데이트 | POST | /api/rooms/:id/ready | { "userId": "string", "isReady": "boolean" } | { "status": "Ready state updated", "userId": "string", "isReady": "boolean" } |
+| 방장 권한 넘기기 | POST | /api/rooms/:id/transfer-leadership | { "currentLeaderId": "string", "newLeaderId": "string" } | { "status": "Leadership transferred", "newLeaderId": "string" } |
+| 방 목록 조회 | GET | /api/rooms |  | [ { "id": "integer", "roomName": "string", "password": "string" } ] |
+| 방 삭제 | DELETE | /api/rooms/:id |  | { "status": "Room deleted" } |
+| 방 참가자 목록 조회 | GET | /api/rooms/:id/participants |  | [ { "userId": "string", "userName": "string", "isLeader": "boolean", "isReady": "boolean" } ] |
+| 방 나가기 | POST | /api/rooms/:id/leave | { "userId": "string" } | { "status": "Participant left", "roomId": "integer", "userId": "string" } |
+| 게임 시작 | POST | /api/rooms/:id/start-game |  | { "status": "Game started" } |
+| 점수 저장 | POST | /api/rooms/:id/score | { "userId": "string", "score": "integer", "gameName": "string", "duration": "integer" } | { "status": "Score and high score updated" \| "Score updated, high score remains the same" \| "Score and new high score inserted" } |
+| 점수 조회 | GET | /api/rooms/:id/scores |  | [ { "userName": "string", "score": "integer", "gameName": "string", "duration": "integer" } ] |
+| 최고 점수 조회 | GET | /users/:userId/high-scores |  | [ { "gameName": "string", "duration": "integer", "highScore": "integer" } ] |
+| 게임 설정 저장 | POST | /api/rooms/:id/settings | { "game": "string", "duration": "integer" } | { "status": "Game settings updated", "game": "string", "duration": "integer" } |
+| 게임 설정 조회 | GET | /api/rooms/:id/settings |  | { "game": "string", "duration": "integer" } |
 
 ## DB 구조 설명
 <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/f679a2e1-2557-4de6-94bf-4373a78c84eb" width="300px">
