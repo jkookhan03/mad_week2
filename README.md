@@ -38,7 +38,7 @@
 
 ### 방 목록
 
-![image](https://github.com/jkookhan03/mad_week2/assets/110375535/e2f7d30f-e207-4316-b329-e95edc9987ad)
+![방 목록](https://github.com/jkookhan03/mad_week2/assets/110375535/ca7ec44c-d081-4508-a5d0-4a1dd09e9b06)
 
 
 - + 버튼을 눌러 방을 추가할 수 있습니다.
