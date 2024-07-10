@@ -408,38 +408,77 @@ class _RoomScreenState extends State<RoomScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ToggleButtons(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('Tab Game'),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedGame = 'tab_game';
+                                _updateGameSettings();
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: _selectedGame == 'tab_game' ? Colors.white : Colors.black, backgroundColor: _selectedGame == 'tab_game' ? Colors.grey : Colors.white,
+                              textStyle: TextStyle(
+                                fontFamily: 'Jua-Regular',
+                                fontSize: 14.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text('야옹'),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('Balloon Game'),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedGame = 'balloon_game';
+                                _updateGameSettings();
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: _selectedGame == 'balloon_game' ? Colors.white : Colors.black, backgroundColor: _selectedGame == 'balloon_game' ? Colors.grey : Colors.white,
+                              textStyle: TextStyle(
+                                fontFamily: 'Jua-Regular',
+                                fontSize: 14.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text('풍선 게임'),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('Star Game'),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 20.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedGame = 'star_game';
+                                _updateGameSettings();
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: _selectedGame == 'star_game' ? Colors.white : Colors.black, backgroundColor: _selectedGame == 'star_game' ? Colors.grey : Colors.white,
+                              textStyle: TextStyle(
+                                fontFamily: 'Jua-Regular',
+                                fontSize: 14.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text('별 먹기 게임'),
                           ),
-                        ],
-                        isSelected: [
-                          _selectedGame == 'tab_game',
-                          _selectedGame == 'balloon_game',
-                          _selectedGame == 'star_game',
-                        ],
-                        onPressed: (int index) {
-                          setState(() {
-                            if (index == 0) {
-                              _selectedGame = 'tab_game';
-                            } else if (index == 1) {
-                              _selectedGame = 'balloon_game';
-                            } else if (index == 2) {
-                              _selectedGame = 'star_game';
-                            }
-                            _updateGameSettings();
-                          });
-                        },
+                        ),
                       ),
                     ],
                   ),
