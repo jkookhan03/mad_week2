@@ -37,7 +37,7 @@
 ## Tab 1: 게임 플레이
 
 ### 방 목록
-![mad_week2_방 목록1](https://github.com/jkookhan03/mad_week2/assets/110375535/b95abeb9-90ca-45f6-8953-8db349a7dfca)
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/b95abeb9-90ca-45f6-8953-8db349a7dfca" width="300px">
 
 
 - + 버튼을 눌러 방을 추가할 수 있습니다.
