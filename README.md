@@ -109,6 +109,9 @@
 
 `fetchRankings` 메서드는 서버로부터 전체 랭킹 데이터를 가져와 `_rankings` 리스트에 저장하는 기능을 합니다. 이 메서드는 HTTP GET 요청을 통해 데이터를 받아오고, 상태 변화를 알리기 위해 `notifyListeners()`를 호출합니다.
 
+## API 명세서
+https://www.notion.so/madcamp/9fa6ca9e833f471397590eb3cb294a76?v=0edc088b5ac4442289ab2719bcfcff90&pvs=4
+
 ## DB 구조 설명
 <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/f679a2e1-2557-4de6-94bf-4373a78c84eb" width="300px">
 
