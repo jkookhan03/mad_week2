@@ -197,9 +197,24 @@ class _UserScreenState extends State<UserScreen> {
                     itemCount: filteredHighScores.length,
                     itemBuilder: (context, index) {
                       final highScore = filteredHighScores[index];
+
+                      // 게임 이름 변환 함수
+                      String getGameDisplayName(String gameName) {
+                        switch (gameName) {
+                          case 'Tab Game':
+                            return '야옹';
+                          case 'Balloon Game':
+                            return '풍선 게임';
+                          case 'Star Game':
+                            return '별 먹기 게임';
+                          default:
+                            return gameName;
+                        }
+                      }
+
                       return ListTile(
                         title: Text(
-                          '${highScore['gameName']}',
+                          getGameDisplayName(highScore['gameName']),
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Jua-Regular',
