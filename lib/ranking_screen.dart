@@ -42,13 +42,13 @@ class RankingScreen extends StatelessWidget {
       } else {
         print('Failed to leave the room: ${response.body}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방에서 나가는데 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('방에서 나가는데 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
       }
     } catch (e) {
       print('Error leaving the room: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('방에서 나가는 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('방에서 나가는 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
     }
   }

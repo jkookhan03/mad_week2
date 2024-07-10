@@ -138,7 +138,7 @@ class _RoomScreenState extends State<RoomScreen> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('참가자 목록을 불러오는데 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('참가자 목록을 불러오는데 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
         setState(() {
           _isLoading = false;
@@ -147,7 +147,7 @@ class _RoomScreenState extends State<RoomScreen> {
     } catch (e) {
       print('Fetch participants error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('참가자 목록을 불러오는 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('참가자 목록을 불러오는 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
       setState(() {
         _isLoading = false;
@@ -172,13 +172,13 @@ class _RoomScreenState extends State<RoomScreen> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('게임 설정 정보를 불러오는데 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('게임 설정 정보를 불러오는데 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
       }
     } catch (e) {
       print('Fetch game settings error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('게임 설정 정보를 불러오는 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('게임 설정 정보를 불러오는 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
     }
   }
@@ -193,13 +193,13 @@ class _RoomScreenState extends State<RoomScreen> {
 
       if (response.statusCode != 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('게임 설정을 업데이트하는 데 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('게임 설정을 업데이트하는 데 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
       }
     } catch (e) {
       print('Update game settings error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('게임 설정을 업데이트하는 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('게임 설정을 업데이트하는 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
     }
   }
@@ -249,13 +249,13 @@ class _RoomScreenState extends State<RoomScreen> {
         _fetchParticipants();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('준비 상태를 업데이트하는 데 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('준비 상태를 업데이트하는 데 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
       }
     } catch (e) {
       print('Update ready state error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('준비 상태를 업데이트하는 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('준비 상태를 업데이트하는 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
     }
 
@@ -280,13 +280,13 @@ class _RoomScreenState extends State<RoomScreen> {
         _fetchParticipants();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방장 권한을 넘기는 데 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('방장 권한을 넘기는 데 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
       }
     } catch (e) {
       print('Transfer leadership error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('방장 권한을 넘기는 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('방장 권한을 넘기는 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
     }
 

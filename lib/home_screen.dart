@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('방 목록을 불러오는데 실패했습니다. 다시 시도해주세요.')),
+            SnackBar(content: Text('방 목록을 불러오는데 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
           );
           setState(() {
             _isLoading = false;
@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Fetch rooms error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방 목록을 불러오는 중 오류가 발생했습니다.')),
+          SnackBar(content: Text('방 목록을 불러오는 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
         );
         setState(() {
           _isLoading = false;
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (roomName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('방 이름을 입력해주세요.')),
+        SnackBar(content: Text('방 이름을 입력해주세요.'), duration: Duration(seconds: 1),),
       );
       return;
     }
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (userId == null || userName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('사용자 ID와 이름이 설정되지 않았습니다.')),
+        SnackBar(content: Text('사용자 ID와 이름이 설정되지 않았습니다.'), duration: Duration(seconds: 1),),
       );
       return;
     }
@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _fetchRooms();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방 생성에 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('방 생성에 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
         setState(() {
           _isLoading = false;
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Create room error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('방 생성 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('방 생성 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
       setState(() {
         _isLoading = false;
@@ -158,12 +158,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방이 성공적으로 삭제되었습니다.')),
+          SnackBar(content: Text('방이 성공적으로 삭제되었습니다.'), duration: Duration(seconds: 1),),
         );
         _fetchRooms();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방 삭제에 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('방 삭제에 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
         setState(() {
           _isLoading = false;
@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Delete room error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('방 삭제 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('방 삭제 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
       setState(() {
         _isLoading = false;
@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (userId == null || userName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('사용자 ID와 이름이 설정되지 않았습니다.')),
+        SnackBar(content: Text('사용자 ID와 이름이 설정되지 않았습니다.'), duration: Duration(seconds: 1),),
       );
       return;
     }
@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방에 성공적으로 참가하였습니다.')),
+          SnackBar(content: Text('방에 성공적으로 참가하였습니다.'), duration: Duration(seconds: 1),),
         );
         Navigator.push(
           context,
@@ -228,14 +228,14 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       } else if (response.statusCode == 403) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('비밀번호가 틀렸습니다.')),
+          SnackBar(content: Text('비밀번호가 틀렸습니다.'), duration: Duration(seconds: 1),),
         );
         setState(() {
           _isLoading = false;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방 참가에 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('방 참가에 실패했습니다. 다시 시도해주세요.'), duration: Duration(seconds: 1),),
         );
         setState(() {
           _isLoading = false;
@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Join room error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('방 참가 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('방 참가 중 오류가 발생했습니다.'), duration: Duration(seconds: 1),),
       );
       setState(() {
         _isLoading = false;
