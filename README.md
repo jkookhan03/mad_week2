@@ -1,12 +1,8 @@
 ## 개요
 
----
-
 몰락실은 ‘몰입오락실’의 줄임말으로, 몰입캠프 사람들과 다양한 게임들을 즐기고 순위를 매기며 최고 점수를 경쟁할 수 있는 앱입니다. 
 
 ## 팀원
-
----
 
 - **한종국**
 
@@ -17,8 +13,6 @@
 [Dayoung331 - Overview](https://github.com/Dayoung331)
 
 ## Tech Stack
-
----
 
 **Front-end** : Flutter
 
@@ -34,11 +28,7 @@
 
 ## About
 
----
-
 ## 앱 첫 실행 시 로그인
-
----
 
 **네이버 로그인 기능**
 
@@ -46,11 +36,7 @@
 
 ## Tab 1: 게임 플레이
 
----
-
 ### 방 목록
-
----
 
 ![1000016930.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/b37a056a-ba59-4f8d-99c9-25d0b326492c/1000016930.gif)
 
@@ -67,15 +53,11 @@
 
 ### Game 1 : YaOng
 
----
-
 ![1000016935.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/8fa81a59-8ce2-449d-adee-893ed4a6d642/1000016935.gif)
 
 제한 시간 내에 클릭을 더 많이 하자
 
 ### Game 2 : Balloon Game
-
----
 
 ![1000016937.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/831ccb3f-cba0-42e0-a50c-edeba90d4ca4/1000016937.gif)
 
@@ -83,15 +65,11 @@
 
 ### Game 3 : Star Game
 
----
-
 ![1000016939.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/db6577de-416c-4dac-8151-25d18c9700de/1000016939.gif)
 
 폭탄을 피해 별을 먹자
 
 ### 게임 종료
-
----
 
 ![1000016944.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/3d63f23a-9680-4bf8-8e4e-24f7428825b8/1000016944.jpg)
 
@@ -104,11 +82,7 @@
 
 ## Tab 2: 유저 화면
 
----
-
 ### **유저 스크린**
-
----
 
 ![1000016949.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/472a8471-eaf5-4846-a02b-fb93b175f34c/1000016949.gif)
 
@@ -124,8 +98,6 @@
 
 ## Tab 3: 랭킹 화면
 
----
-
 - 게임과 게임 시간을 선택하면 모든 참가자들의 최고 기록을 집계해서 랭킹을 표시해줍니다.
     
     ![1000016947.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/09c90b8f-4390-468a-b892-6e1c58184474/1000016947.gif)
@@ -136,10 +108,7 @@
 `fetchRankings` 메서드는 서버로부터 전체 랭킹 데이터를 가져와 `_rankings` 리스트에 저장하는 기능을 합니다. 이 메서드는 HTTP GET 요청을 통해 데이터를 받아오고, 상태 변화를 알리기 위해 `notifyListeners()`를 호출합니다.
 
 ## DB 구조 설명
-
----
-
-![Mad_week2_DB.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/2bb5128f-ddd7-4070-83b1-b89abd50d728/Mad_week2_DB.png)
+![Mad_week2_DB](https://github.com/jkookhan03/mad_week2/assets/121784739/831ab64a-834c-4cd7-abaf-c1cae4b43249)
 
 ### 1. `users` 테이블
 
@@ -198,3 +167,5 @@
     - `duration`: 게임 시간.
 
 ## APK Link
+
+https://drive.google.com/file/d/1UZ3D7byjoUTGjb9ITOkn3OVn6-W0nYoS/view?usp=sharing
