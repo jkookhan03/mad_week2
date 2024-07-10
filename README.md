@@ -39,43 +39,44 @@
 ### 방 목록
 <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/b95abeb9-90ca-45f6-8953-8db349a7dfca" width="300px">
 
-
 - + 버튼을 눌러 방을 추가할 수 있습니다.
 
-<img src="mad_week2_방 목록1.gif" alt="이미지 1" width="300"/
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/972d5c70-edc9-4274-9dca-5ac6d868101e" width="300px">
 
 - 방장이 게임 종류와 시간을 선택하고 참가자들이 전부 준비되면 ‘게임 시작’ 버튼이 활성화됩니다.
 - 3초 카운트다운 후 모든 참가자들의 화면에서 동시에 게임이 시작됩니다.
 
-![1000016941.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/ca12d453-6074-4cfe-90b9-80b28d7e1a31/1000016941.gif)
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/22cd2861-a11f-4bf6-b3b2-bfa00fc60b68" width="300px">
 
 - 방장이 참가자 옆의 아이콘을 선택하면 방장 권한을 넘겨줄 수 있고, ‘게임 시작’ 버튼 대신 ‘준비’와 ‘준비 해제’ 버튼이 나타납니다.
 
 ### Game 1 : YaOng
 
-![1000016935.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/8fa81a59-8ce2-449d-adee-893ed4a6d642/1000016935.gif)
+
 
 제한 시간 내에 클릭을 더 많이 하자
 
 ### Game 2 : Balloon Game
 
-![1000016937.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/831ccb3f-cba0-42e0-a50c-edeba90d4ca4/1000016937.gif)
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/f8d74771-e6a0-46bd-ba05-f6fbdae50ab9" width="300px">
+
 
 글자 색깔에 속지 말고 글자가 의미하는 올바른 색깔의 풍선을 터뜨리자
 
 ### Game 3 : Star Game
 
-![1000016939.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/db6577de-416c-4dac-8151-25d18c9700de/1000016939.gif)
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/8dd41e7e-cc37-4009-b3ad-4efac6b6866a" width="300px">
+
 
 폭탄을 피해 별을 먹자
 
 ### 게임 종료
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/6ebb09c8-2e4f-4849-bf76-d0620caa74bb" width="300px">
 
-![1000016944.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/3d63f23a-9680-4bf8-8e4e-24f7428825b8/1000016944.jpg)
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/77eb6699-9493-42d3-86c7-b7ba7f2cf4ac" width="300px">
 
-![1000016943.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/83f03aea-599a-4e6b-8005-559f44379f3e/1000016943.jpg)
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/987df374-fa1a-4e0e-b678-3c572347cc94" width="300px">
 
-![1000016942.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/510d3516-b9c4-458d-b07e-7c60a8b11961/1000016942.jpg)
 
 - 제한 시간 후에 같은 방 참가자들의 점수가 오름차순으로 정렬됩니다.
 - ‘로비로 나가기’ 버튼을 누르면 방을 나가 방 목록 화면으로 돌아가고, ‘게임 다시하기’ 버튼을 누르면 원래 있던 대기방으로 돌아가 같이 게임을 했던 참가자들과 다시 게임을 할 수 있습니다.
@@ -84,7 +85,7 @@
 
 ### **유저 스크린**
 
-![1000016949.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/472a8471-eaf5-4846-a02b-fb93b175f34c/1000016949.gif)
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/83e86588-ea06-48ce-8e5f-48184d8466cd" width="300px">
 
 `User_Screen`은 사용자의 프로필 정보를 보여주고, 사용자의 게임 최고 점수를 확인할 수 있는 화면입니다. 이 화면은 사용자의 로그인 상태, 프로필 이미지, 이름, 최고 점수를 포함하며, 게임 시간에 따라 최고 점수를 필터링하여 보여줍니다. 또한, 로그아웃 기능도 제공합니다.
 
@@ -99,8 +100,9 @@
 ## Tab 3: 랭킹 화면
 
 - 게임과 게임 시간을 선택하면 모든 참가자들의 최고 기록을 집계해서 랭킹을 표시해줍니다.
-    
-    ![1000016947.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/09c90b8f-4390-468a-b892-6e1c58184474/1000016947.gif)
+- 
+    <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/2e9903b6-490e-4c53-a73d-c37ad3ee80ff" width="300px">
+
     
 
 **랭킹 데이터 불러오기: fetchRankings**
@@ -108,7 +110,7 @@
 `fetchRankings` 메서드는 서버로부터 전체 랭킹 데이터를 가져와 `_rankings` 리스트에 저장하는 기능을 합니다. 이 메서드는 HTTP GET 요청을 통해 데이터를 받아오고, 상태 변화를 알리기 위해 `notifyListeners()`를 호출합니다.
 
 ## DB 구조 설명
-![Mad_week2_DB](https://github.com/jkookhan03/mad_week2/assets/121784739/831ab64a-834c-4cd7-abaf-c1cae4b43249)
+<img src="https://github.com/jkookhan03/mad_week2/assets/110375535/f679a2e1-2557-4de6-94bf-4373a78c84eb" width="300px">
 
 ### 1. `users` 테이블
 
