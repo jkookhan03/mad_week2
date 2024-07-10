@@ -38,7 +38,8 @@
 
 ### 방 목록
 
-![1000016930.gif](https://prod-files-secure.s3.us-west-2.amazonaws.com/f6cb388f-3934-47d6-9928-26d2e10eb0fc/b37a056a-ba59-4f8d-99c9-25d0b326492c/1000016930.gif)
+![image](https://github.com/jkookhan03/mad_week2/assets/110375535/e2f7d30f-e207-4316-b329-e95edc9987ad)
+
 
 - + 버튼을 눌러 방을 추가할 수 있습니다.
 
