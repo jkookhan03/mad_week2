@@ -199,7 +199,7 @@ class _UserScreenState extends State<UserScreen> {
                       final highScore = filteredHighScores[index];
                       return ListTile(
                         title: Text(
-                          '${highScore['gameName']} (${highScore['duration']}초)',
+                          '${highScore['gameName']}',
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Jua-Regular',

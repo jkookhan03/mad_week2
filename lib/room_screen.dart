@@ -6,6 +6,7 @@ import 'package:web_socket_channel/io.dart';
 import 'tab_game_screen.dart';
 import 'balloon_game_screen.dart';
 import 'star_game_screen.dart';
+import 'main.dart'; // MyHomePage import 추가
 
 class RoomScreen extends StatefulWidget {
   final int roomId;
@@ -311,10 +312,28 @@ class _RoomScreenState extends State<RoomScreen> {
         if (!_isGameStarted) {
           await _leaveRoom();
         }
-        return true;
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage()),
+              (Route<dynamic> route) => false,
+        );
+        return true; // 뒤로가기 버튼을 눌렀을 때 현재 화면을 닫음
       },
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              if (!_isGameStarted) {
+                _leaveRoom();
+              }
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
+                    (Route<dynamic> route) => false,
+              );
+            },
+          ),
           title: Text(
             'Room: ${widget.roomName}',
             style: TextStyle(
@@ -487,22 +506,22 @@ class _RoomScreenState extends State<RoomScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                          '게임 시간: ',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Jua-Regular'
-                          ),
+                        '게임 시간: ',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Jua-Regular'
+                        ),
                       ),
                       DropdownButton<int>(
                         value: _selectedDuration,
                         items: [
                           DropdownMenuItem(
-                              child: Text(
-                                '10초',
-                                style: TextStyle(
+                            child: Text(
+                              '10초',
+                              style: TextStyle(
                                   fontSize: 16, fontFamily: 'Jua-Regular'
-                                ),
                               ),
+                            ),
                             value: 10,
                           ),
                           DropdownMenuItem(
