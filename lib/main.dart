@@ -256,6 +256,12 @@ class LoginScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Image.asset(
+              'assets/logo.png',
+              width: 600,
+              height: 300,
+            ),
+            SizedBox(height: 50), // 로고와 로그인 버튼 사이의 간격을 위해 추가
             GestureDetector(
               onTap: () async {
                 bool success = await loginState.login();
@@ -277,3 +283,4 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
+

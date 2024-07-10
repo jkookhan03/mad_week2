@@ -2,7 +2,7 @@
     package="com.example.mad_week2">
 
     <application
-        android:label="mad_week2"
+        android:label="몰락실"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

@@ -64,6 +64,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/logo.png
     - assets/star.png
     - assets/bomb.png
     - assets/btnG_login.png
