@@ -24,6 +24,20 @@ class _TotalRankingScreenState extends State<TotalRankingScreen> {
   Widget build(BuildContext context) {
     final loginState = Provider.of<LoginState>(context);
 
+    // 게임 이름 변환 함수
+    String getGameDisplayName(String gameName) {
+      switch (gameName) {
+        case 'Tab Game':
+          return '야옹';
+        case 'Balloon Game':
+          return '풍선 게임';
+        case 'Star Game':
+          return '별 먹기 게임';
+        default:
+          return gameName;
+      }
+    }
+
     // 선택한 게임과 duration에 따른 랭킹 필터링
     final filteredRankings = loginState.rankings
         .where((ranking) =>
@@ -79,7 +93,7 @@ class _TotalRankingScreenState extends State<TotalRankingScreen> {
                               return DropdownMenuItem<String>(
                                 value: game,
                                 child: Text(
-                                  game,
+                                  getGameDisplayName(game),
                                   style: TextStyle(fontFamily: 'Jua-Regular'),
                                 ),
                               );
@@ -140,13 +154,18 @@ class _TotalRankingScreenState extends State<TotalRankingScreen> {
                       final ranking = filteredRankings[index];
                       return ListTile(
                         title: Text(
-                          '${ranking['userName']} (${ranking['duration']}초)',
+                          '${ranking['userName']}',
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Jua-Regular',
                           ),
                         ),
-                        trailing: Text('${ranking['highScore']} 점'),
+                        trailing: Text(
+                          '${ranking['highScore']} 점',
+                          style: TextStyle(
+                              fontFamily: 'Jua-Regular'
+                          ),
+                        ),
                       );
                     },
                   ),
