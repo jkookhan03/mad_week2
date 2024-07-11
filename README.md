@@ -4,11 +4,11 @@
 
 ## 팀원
 
-- **한종국**
+- **한종국 - 백엔드**
 
 [jkookhan03 - Overview](https://github.com/jkookhan03)
 
-- **정다영**
+- **정다영 - 프론트엔드, 디자인**
 
 [Dayoung331 - Overview](https://github.com/Dayoung331)
 
@@ -40,11 +40,16 @@
 <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/b95abeb9-90ca-45f6-8953-8db349a7dfca" width="300px">
 
 - + 버튼을 눌러 방을 추가할 수 있습니다.
+    - 비밀 방 스위치 버튼을 누르면 비밀번호를 설정할 수 있습니다.
+- 방 목록은 MySQL `Rooms` 테이블에 저장되고, KCloud 서버와 NodeJS 코드에 의해 관리됩니다.
 
 <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/972d5c70-edc9-4274-9dca-5ac6d868101e" width="300px">
 
 - 방장이 게임 종류와 시간을 선택하고 참가자들이 전부 준비되면 ‘게임 시작’ 버튼이 활성화됩니다.
 - 3초 카운트다운 후 모든 참가자들의 화면에서 동시에 게임이 시작됩니다.
+- 방 참가자 목록과 준비상태, 방장에 대한 정보는 MySQL `participants` 테이블에 저장됩니다.
+- 방장이 ‘게임 시작’ 버튼을 누르면 서버로 `WebSocket`을 전송하고, 서버는 이 메세지를 수신하여 해당 방에 연결된 모든 클라이언트에게 게임시작 메세지를 브로드캐스트합니다.
+- 서버에게서 게임 종류와 시간, 그리고 게임을 시작하라는 정보를 담은 `WebSocket`을 받은 클라이언트들은 동시에 게임을 시작합니다.
 
 <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/22cd2861-a11f-4bf6-b3b2-bfa00fc60b68" width="300px">
 
@@ -78,8 +83,9 @@
 <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/987df374-fa1a-4e0e-b678-3c572347cc94" width="300px">
 
 
-- 제한 시간 후에 같은 방 참가자들의 점수가 오름차순으로 정렬됩니다.
+- 제한 시간 후에 같은 방 참가자들의 점수가 내림차순으로 정렬됩니다.
 - ‘로비로 나가기’ 버튼을 누르면 방을 나가 방 목록 화면으로 돌아가고, ‘게임 다시하기’ 버튼을 누르면 원래 있던 대기방으로 돌아가 같이 게임을 했던 참가자들과 다시 게임을 할 수 있습니다.
+- 게임 점수는 MySQL `Scores` 테이블에 저장됩니다. 방에 있는 모든 참가자가 나가서 방이 사라질 경우 Scores 테이블에 저장된 정보도 사라지지만, 최고기록을 세웠을 경우에는 자동으로 MySQL `user_high_scores` 테이블에 업데이트됩니다.
 
 ## Tab 2: 유저 화면
 
@@ -99,7 +105,7 @@
 
 ## Tab 3: 랭킹 화면
 
-- 게임과 게임 시간을 선택하면 모든 참가자들의 최고 기록을 집계해서 랭킹을 표시해줍니다.
+- 게임과 게임 시간을 선택하면 모든 참가자들의 `user_high_scores` 테이블을 이용해 최고 기록을 집계해서 랭킹을 표시해줍니다.
 - 
     <img src="https://github.com/jkookhan03/mad_week2/assets/110375535/2e9903b6-490e-4c53-a73d-c37ad3ee80ff" width="300px">
 
